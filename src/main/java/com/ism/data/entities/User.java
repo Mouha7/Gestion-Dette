@@ -10,5 +10,11 @@ public class User {
     private String email;
     private String login;
     private String password;
+    private boolean status;
     private Role role;
+    private static int nbr;
+
+    public User() {
+        this.idUser = ++nbr;
+    }
 }
