@@ -4,25 +4,29 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 import com.ism.core.factory.IFactory;
-import com.ism.core.factory.IFactorySer;
+import com.ism.core.factory.IFactoryService;
 import com.ism.core.factory.IFactoryView;
+import com.ism.data.entities.Article;
 import com.ism.data.entities.Client;
 import com.ism.data.entities.Dette;
 import com.ism.data.entities.User;
-import com.ism.services.IClientSer;
-import com.ism.services.IUserSer;
+import com.ism.services.IArticleService;
+import com.ism.services.IClientService;
+import com.ism.services.IDetteService;
+import com.ism.services.IUserService;
+import com.ism.views.IArticleView;
 import com.ism.views.IClientView;
+import com.ism.views.IDetteView;
 import com.ism.views.IUserView;
-import com.ism.views.IView;
 import com.ism.views.admin.IApplicationAdmin;
 
 public class ApplicationAdmin implements IApplicationAdmin {
     private static final String MSG_CHOICE = "Choisissez une option : ";
     private static final String MSG_CLIENT = "Aucun client n'a été enregistré.";
     private static final String MSG_ACCOUNT = "Compte créer avec succès !";
-    private final IFactorySer factoryService;
+    private final IFactoryService factoryService;
     private final IFactoryView factoryView;
-    private Scanner scanner;
+    private final Scanner scanner;
 
     public ApplicationAdmin(IFactory factory, Scanner scanner) {
         this.factoryService = factory.getFactoryService();
@@ -152,13 +156,13 @@ public class ApplicationAdmin implements IApplicationAdmin {
         System.out.println(msg);
     }
 
-    public void soldes(IDetteService iDetteService, IView<Dette> detteView) {
-        if (isEmpty(iDetteService.length(), "Aucun compte soldé n'a été enregistré.")) {
+    public void soldes(IDetteService detteService, IDetteView detteView) {
+        if (isEmpty(detteService.length(), "Aucun compte soldé n'a été enregistré.")) {
             return;
         }
-        int index = detteView.display(iDetteService.getAllSoldes());
-        boolean state = !iDetteService.getBy(index).isStatus();
-        iDetteService.setStatus(index, state);
+        Dette dette = detteView.getObject(detteService.getAllSoldes());
+        boolean state = !dette.isStatus();
+        detteService.setStatus(dette, state);
         msgStatus(state);
     }
 
@@ -166,9 +170,9 @@ public class ApplicationAdmin implements IApplicationAdmin {
         if (isEmpty(articleService.length(), "Aucun article n'a été enregistré.")) {
             return;
         }
-        int index = articleView.display(articleService.findAll());
-        Double newQte = articleView.checked("Entrez la nouvelle quantité de l'article : ", "la quantité");
-        articleService.setQte(index, newQte);
+        Article article = articleView.getObject(articleService.findAll());
+        Integer newQte = Integer.valueOf(articleView.checked("Entrez la nouvelle quantité de l'article : ", "la quantité").toString());
+        articleService.setQte(article, newQte);
         msgSuccess("Modifiée avec succès !");
     }
 
@@ -184,7 +188,7 @@ public class ApplicationAdmin implements IApplicationAdmin {
         msgSuccess();
     }
 
-    public void listingUserActifs(IUserSer userService, IUserView userView) {
+    public void listingUserActifs(IUserService userService, IUserView userView) {
         int choixRole = role();
         switch (choixRole) {
             case 1:
@@ -219,22 +223,21 @@ public class ApplicationAdmin implements IApplicationAdmin {
         }
     }
 
-    public void activeDesactiveAccount(IUserSer userService, IUserView userView) {
+    public void activeDesactiveAccount(IUserService userService, IUserView userView) {
             if (isEmpty(userService.length(), "Aucun compte admin ou boutiquier ou client n'a été enregistré.")) {
                 return;
             }
-            int index = userView.display(userService.findAll());
-            boolean state = !userService.getBy(index).isStatus();
-            userService.setStatus(index, state);
+            User user = userView.getObject(userService.findAll());
+            boolean state = !user.isStatus();
+            userService.setStatus(user, state);
             msgStatus(state);
     }
 
-    public void createAccountCustomer(IClientSer clientService, IClientView clientView, IUserSer userService, IUserView userView) {
+    public void createAccountCustomer(IClientService clientService, IClientView clientView, IUserService userService, IUserView userView) {
         if (isEmpty(clientService.findAllCustomerAvailable().size(), MSG_CLIENT)) {
             return;
         }
-        int index = clientView.display(clientService.findAllCustomerAvailable());
-        Client client = clientService.getBy(index);
+        Client client = clientView.getObject(clientService.findAllCustomerAvailable());
         userService.add(userView.accountCustomer(client));
         msgSuccess(MSG_ACCOUNT);
     }

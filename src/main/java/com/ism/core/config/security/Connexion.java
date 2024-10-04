@@ -4,18 +4,19 @@ import java.util.Scanner;
 
 import com.ism.core.factory.IFactory;
 import com.ism.data.entities.User;
-import com.ism.services.IUserSer;
+import com.ism.services.IUserService;
 
-public class Connexion {
+public class Connexion implements IConnexion {
     private Scanner scanner;
-    private IUserSer userService;
+    private IUserService userService;
 
-    public Connexion(IFactory factory, Scanner scanner) {
+    public Connexion(IUserService userService, Scanner scanner) {
         this.scanner = scanner;
-        this.userService = factory.getFactoryService().getInstanceUserRepository();
+        this.userService = userService;
     }
     
-    public int connexion() {
+    @Override
+    public String connexion() {
         User user;
         do {
             System.out.println("Bienvenu sur l'application de gestion de dette");
@@ -29,7 +30,7 @@ public class Connexion {
                 System.out.println("Login ou Mot de passe incorrect.");
             }
         } while (user == null);
-        return user.getRole().ordinal();
+        return user.getRole().name();
     }
 
 

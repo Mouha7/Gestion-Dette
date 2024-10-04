@@ -6,4 +6,5 @@ public interface IRepository<T> {
     List<T> selectAll();
     boolean insert(T item);
     T selectBy(T object);
+    int size();
 }

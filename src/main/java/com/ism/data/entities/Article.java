@@ -9,7 +9,7 @@ public class Article {
     private int idArticle;
     private String libelle;
     private Double prix;
-    private int qteStock;
+    private Integer qteStock;
 
     // Nav
     private List<Detail> details;

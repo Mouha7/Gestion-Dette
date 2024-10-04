@@ -10,11 +10,12 @@ import lombok.Data;
 @Data
 public class Dette {
     private int idDette;
-    private LocalDate dateCreation;
     private Double montantTotal;
     private Double montantVerser;
     private Double montantRestant;
+    private boolean status;
     private EtatDette etat;
+    private LocalDate dateCreation;
 
     // Nav
     private Client client;

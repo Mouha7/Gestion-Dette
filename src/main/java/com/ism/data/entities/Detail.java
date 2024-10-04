@@ -6,6 +6,7 @@ import lombok.Data;
 public class Detail {
     private int idDetteArticle;
     private int qte;
+    private Double prixVente;
 
     // Nav
     private Article article;

@@ -1,23 +1,23 @@
 package com.ism.core.factory.implement;
 
 import com.ism.core.factory.IFactory;
-import com.ism.core.factory.IFactoryRepo;
-import com.ism.core.factory.IFactorySer;
+import com.ism.core.factory.IFactoryRepository;
+import com.ism.core.factory.IFactoryService;
 import com.ism.core.factory.IFactoryView;
 
 public class Factory implements IFactory {
     @Override
-    public IFactoryRepo getFactoryRepository() {
-        return new FactoryRepo();
+    public IFactoryRepository getFactoryRepository() {
+        return new FactoryRepository();
     }
 
     @Override
-    public IFactorySer getFactoryService() {
-        return new FactorySer();
+    public IFactoryService getFactoryService() {
+        return new FactoryService(getFactoryRepository());
     }
 
     @Override
     public IFactoryView getFactoryView() {
-        return new FactoryView();
+        return new FactoryView(getFactoryService());
     }    
 }

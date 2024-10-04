@@ -25,4 +25,9 @@ public class Repository<T> implements IRepository<T> {
                 .findFirst()
                 .orElse(null);
     }
+
+    @Override
+    public int size() {
+        return list.size();
+    }
 }

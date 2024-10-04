@@ -10,8 +10,9 @@ import com.ism.views.client.implement.ApplicationClient;
 import com.ism.views.store.IApplicationStorekeeper;
 import com.ism.views.store.implement.ApplicationStorekeeper;
 
-public class Router {
+public class Router implements IRouter {
     
+    @Override
     public void navigate(String role, IFactory factory, Scanner scanner) {
         switch (role) {
             case "ADMIN":

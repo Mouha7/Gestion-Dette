@@ -26,7 +26,7 @@ public class Client {
         demandeDettes.add(demandeDette);
     }
 
-    public void addDette(Dette dette) {
+    public void addDetteClient(Dette dette) {
         dettes.add(dette);
     }
 }
