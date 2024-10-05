@@ -1,8 +1,14 @@
 package com.ism.data.entities;
 
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode
 public class Detail {
     private int idDetteArticle;
     private int qte;
@@ -10,5 +16,5 @@ public class Detail {
 
     // Nav
     private Article article;
-    private DemandeDette demandeDette;
+    private Dette dette;
 }

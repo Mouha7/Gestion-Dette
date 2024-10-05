@@ -35,7 +35,12 @@ public class ClientService implements IClientService {
 
     @Override
     public Client findBy(Client client) {
-        return clientRepository.selectBy(client);
+        for (Client cl : findAll()) {
+            if(cl.getUser().getIdUser() == client.getUser().getIdUser()) {
+                return cl;
+            }
+        }
+        return null;
     }
 
     @Override

@@ -25,7 +25,12 @@ public class UserService implements IUserService {
 
     @Override
     public User findBy(User user) {
-        return userRepository.selectBy(user);
+        for (User us : userRepository.selectAll()) {
+            if (us.getIdUser() == user.getIdUser()) {
+                return us;
+            }
+        }
+        return null;
     }
 
     @Override

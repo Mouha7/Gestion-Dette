@@ -29,19 +29,20 @@ public class ClientView extends ImpView<Client> implements IClientView {
 
     @Override
     public Client getObject(List<Client> clients) {
-        Client client = new Client();
+        Client client;
         int choix;
         int count = clients.size();
         this.afficher(clients);
         do {
+            client = new Client();
             System.out.print("Choisissez un client par son id: ");
             choix = scanner.nextInt();
             client.setIdClient(choix);
             client = clientService.findBy(client);
-            if (client == null || choix >= count) {
+            if (client == null || choix > count) {
                 System.out.println("Erreur, l'id est invalide.");
             }
-        } while (client == null || choix >= count);
+        } while (client == null || choix > count);
         return client;
     }
 }

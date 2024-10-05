@@ -39,8 +39,16 @@ public class ArticleService implements IArticleService {
     }
 
     @Override
-    public Article findBy(Article article) {
-        return articleRepository.selectBy(article);
+    public Article findBy(Article article, List<Article> articles) {
+        for (Article value : articles) {
+            if (value.getIdArticle() == article.getIdArticle()) {
+                return value;
+            }
+            if (value.getLibelle().compareTo(article.getLibelle()) == 0) {
+                return value;
+            }
+        }
+        return null;
     }
     
 }

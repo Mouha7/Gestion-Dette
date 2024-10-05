@@ -1,9 +1,16 @@
 package com.ism.data.entities;
 
 import java.util.List;
-import lombok.Data;
 
-@Data
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode
 public class Client {
     private int idClient;
     private String surname;

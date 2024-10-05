@@ -20,19 +20,20 @@ public class DetteView extends ImpView<Dette> implements IDetteView {
 
     @Override
     public Dette getObject(List<Dette> dettes) {
-        Dette dette = new Dette();
+        Dette dette;
         int choix;
         int count = dettes.size();
         this.afficher(dettes);
         do {
+            dette = new Dette();
             System.out.print("Choisissez une dette par son id: ");
             choix = scanner.nextInt();
             dette.setIdDette(choix);
             dette = detteService.findBy(dette);
-            if (dette == null || choix >= count) {
+            if (dette == null || choix > count) {
                 System.out.println("Erreur, l'id est invalide.");
             }
-        } while (dette == null || choix >= count);
+        } while (dette == null || choix > count);
         return dette;
     }
     

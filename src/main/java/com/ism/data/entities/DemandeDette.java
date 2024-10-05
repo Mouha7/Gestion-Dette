@@ -5,14 +5,21 @@ import java.util.List;
 
 import com.ism.data.enums.EtatDemandeDette;
 
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode
 public class DemandeDette {
     private int idDemandeDette;
     private LocalDate dateDemande;
     private Double montantTotal;
     private EtatDemandeDette etat;
+    private static int nbr;
 
     // Nav
     private List<DemandeArticle> demandeArticles;
@@ -21,5 +28,9 @@ public class DemandeDette {
 
     public void addDemandeArticle(DemandeArticle demandeArticle) {
         demandeArticles.add(demandeArticle);
+    }
+
+    public DemandeDette() {
+        this.idDemandeDette = ++nbr;
     }
 }

@@ -2,9 +2,15 @@ package com.ism.data.entities;
 
 import com.ism.data.enums.Role;
 
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode
 public class User {
     private int idUser;
     private String email;

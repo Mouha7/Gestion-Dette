@@ -9,6 +9,6 @@ public interface IArticleService {
     List<Article> findAll();
     void setQte(Article article, int newQte);
     List<Article> findAllAvailable();
-    Article findBy(Article article);
+    Article findBy(Article article, List<Article> articles);
     int length();
 }

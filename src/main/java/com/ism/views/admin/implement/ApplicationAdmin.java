@@ -3,9 +3,6 @@ package com.ism.views.admin.implement;
 import java.util.Arrays;
 import java.util.Scanner;
 
-import com.ism.core.factory.IFactory;
-import com.ism.core.factory.IFactoryService;
-import com.ism.core.factory.IFactoryView;
 import com.ism.data.entities.Article;
 import com.ism.data.entities.Client;
 import com.ism.data.entities.Dette;
@@ -19,60 +16,73 @@ import com.ism.views.IClientView;
 import com.ism.views.IDetteView;
 import com.ism.views.IUserView;
 import com.ism.views.admin.IApplicationAdmin;
+import com.ism.views.implement.Application;
 
-public class ApplicationAdmin implements IApplicationAdmin {
-    private static final String MSG_CHOICE = "Choisissez une option : ";
+public class ApplicationAdmin extends Application implements IApplicationAdmin {
     private static final String MSG_CLIENT = "Aucun client n'a été enregistré.";
     private static final String MSG_ACCOUNT = "Compte créer avec succès !";
-    private final IFactoryService factoryService;
-    private final IFactoryView factoryView;
+    private final IArticleService articleService;
+    private final IArticleView articleView;
+    private final IClientService clientService;
+    private final IClientView clientView;
+    private final IDetteService detteService;
+    private final IDetteView detteView;
+    private final IUserService userService;
+    private final IUserView userView;
     private final Scanner scanner;
 
-    public ApplicationAdmin(IFactory factory, Scanner scanner) {
-        this.factoryService = factory.getFactoryService();
-        this.factoryView = factory.getFactoryView();
+    public ApplicationAdmin(IArticleService articleService, IArticleView articleView, IClientService clientService,
+            IClientView clientView, IDetteService detteService, IDetteView detteView, IUserService userService,
+            IUserView userView, Scanner scanner) {
+        this.articleService = articleService;
+        this.articleView = articleView;
+        this.clientService = clientService;
+        this.clientView = clientView;
+        this.detteService = detteService;
+        this.detteView = detteView;
+        this.userService = userService;
+        this.userView = userView;
         this.scanner = scanner;
-        run();
     }
 
     @Override
-    public void run() {
-        int choix;
+    public void run(User user) {
+        Integer choix;
         do {
             choix = menu();
-            scanner.nextLine();
             switch (choix) {
                 case 0:
-                    factoryService.getInstanceClientService().add(factoryView.getInstanceClientView().saisir());
+                    clientService.add(clientView.saisir());
                     msgSuccess(MSG_ACCOUNT);
                     break;
                 case 1:
-                    createAccountCustomer(factoryService.getInstanceClientService(), factoryView.getInstanceClientView(), factoryService.getInstanceUserService(), factoryView.getInstanceUserView());
+                    createAccountCustomer(clientService, clientView, userService, userView);
                     break;
                 case 2:
-                    factoryService.getInstanceUserService().add(factoryView.getInstanceUserView().saisir());
+                    userService.add(userView.saisir());
                     msgSuccess(MSG_ACCOUNT);
                     break;
                 case 3:
-                    activeDesactiveAccount(factoryService.getInstanceUserService(), factoryView.getInstanceUserView());
+                    activeDesactiveAccount(userService, userView);
                     break;
                 case 4:
-                    listingUserActifs(factoryService.getInstanceUserService(), factoryView.getInstanceUserView());
+                    listingUserActifs(userService, userView);
                     break;
                 case 5:
-                    createArticle(factoryService.getInstanceArticleService(), factoryView.getInstanceArticleView());
+                    createArticle(articleService, articleView);
                     break;
                 case 6:
-                    listingArticleAvailable(factoryService.getInstanceArticleService(), factoryView.getInstanceArticleView());
+                    articleService.findAll();
+                    listingArticleAvailable(articleService, articleView);
                     break;
                 case 7:
-                    updateQte(factoryService.getInstanceArticleService(), factoryView.getInstanceArticleView());
+                    updateQte(articleService, articleView);
                     break;
                 case 8:
-                    soldes(factoryService.getInstanceDetteService(), factoryView.getInstanceDette());
+                    soldes(detteService, detteView);
                     break;
                 default:
-                    System.out.println("Merci d'avoir utiliser notre application, au revoir !");
+                    System.out.println(MSG_EXIT);
                     break;
             }
         } while (choix != 9);
@@ -81,9 +91,9 @@ public class ApplicationAdmin implements IApplicationAdmin {
     @Override
     public int menu() {
         String choice;
-        String[] values = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+        String[] validValues = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
         do {
-            System.out.println("1- Créer un compte à un client n’ayant pas de compte");
+            System.out.println("1- Créer un compte à un client n'ayant pas de compte");
             System.out.println("2- Créer un compte utilisateur (Admin ou Boutiquier)");
             System.out.println("3- Activer/Désactiver un compte utilisateur");
             System.out.println("4- Lister les comptes utilisateurs actif par rôle");
@@ -91,16 +101,17 @@ public class ApplicationAdmin implements IApplicationAdmin {
             System.out.println("6- Lister les articles disponibles");
             System.out.println("7- Mettre à jour la quantité en stock d'un article");
             System.out.println("8- Archiver les dettes soldées");
-            System.out.println("9- Quitter");
+            System.out.println("9- Déconnexion");
             System.out.print(MSG_CHOICE);
             choice = scanner.nextLine();
-            if (Arrays.asList(values).contains(choice)) {
-                System.out.println("Erreur, choix invalide.");
+            if (!Arrays.asList(validValues).contains(choice)) {
+                System.out.println("Erreur, choix de l'index du menu invalide.");
             }
-        } while (Arrays.asList(values).contains(choice));
+        } while (!Arrays.asList(validValues).contains(choice));
         return Integer.parseInt(choice);
     }
-    
+
+    @Override
     public int status() {
         String choix;
         do {
@@ -116,6 +127,7 @@ public class ApplicationAdmin implements IApplicationAdmin {
         return Integer.parseInt(choix);
     }
 
+    @Override
     public boolean isEmpty(int size, String msg) {
         if (size == 0) {
             System.out.println(msg);
@@ -124,6 +136,7 @@ public class ApplicationAdmin implements IApplicationAdmin {
         return false;
     }
 
+    @Override
     public void msgStatus(boolean state) {
         if (state) {
             System.out.println("Activer avec succès");
@@ -132,6 +145,7 @@ public class ApplicationAdmin implements IApplicationAdmin {
         }
     }
 
+    @Override
     public int role() {
         String choix;
         do {
@@ -148,14 +162,17 @@ public class ApplicationAdmin implements IApplicationAdmin {
         return Integer.parseInt(choix);
     }
 
+    @Override
     public void msgSuccess() {
         msgSuccess("Ajouté avec succès !");
     }
 
+    @Override
     public void msgSuccess(String msg) {
         System.out.println(msg);
     }
 
+    @Override
     public void soldes(IDetteService detteService, IDetteView detteView) {
         if (isEmpty(detteService.length(), "Aucun compte soldé n'a été enregistré.")) {
             return;
@@ -166,16 +183,19 @@ public class ApplicationAdmin implements IApplicationAdmin {
         msgStatus(state);
     }
 
+    @Override
     public void updateQte(IArticleService articleService, IArticleView articleView) {
         if (isEmpty(articleService.length(), "Aucun article n'a été enregistré.")) {
             return;
         }
         Article article = articleView.getObject(articleService.findAll());
-        Integer newQte = Integer.valueOf(articleView.checked("Entrez la nouvelle quantité de l'article : ", "la quantité").toString());
+        Integer newQte = Integer
+                .valueOf(articleView.checked("Entrez la nouvelle quantité de l'article : ", "la quantité").toString());
         articleService.setQte(article, newQte);
         msgSuccess("Modifiée avec succès !");
     }
 
+    @Override
     public void listingArticleAvailable(IArticleService articleService, IArticleView articleView) {
         if (isEmpty(articleService.length(), "Aucun article n'a été enregistré.")) {
             return;
@@ -183,11 +203,13 @@ public class ApplicationAdmin implements IApplicationAdmin {
         articleView.afficher(articleService.findAllAvailable());
     }
 
+    @Override
     public void createArticle(IArticleService articleService, IArticleView articleView) {
         articleService.add(articleView.saisir());
         msgSuccess();
     }
 
+    @Override
     public void listingUserActifs(IUserService userService, IUserView userView) {
         int choixRole = role();
         switch (choixRole) {
@@ -223,17 +245,20 @@ public class ApplicationAdmin implements IApplicationAdmin {
         }
     }
 
+    @Override
     public void activeDesactiveAccount(IUserService userService, IUserView userView) {
-            if (isEmpty(userService.length(), "Aucun compte admin ou boutiquier ou client n'a été enregistré.")) {
-                return;
-            }
-            User user = userView.getObject(userService.findAll());
-            boolean state = !user.isStatus();
-            userService.setStatus(user, state);
-            msgStatus(state);
+        if (isEmpty(userService.length(), "Aucun compte admin ou boutiquier ou client n'a été enregistré.")) {
+            return;
+        }
+        User user = userView.getObject(userService.findAll());
+        boolean state = !user.isStatus();
+        userService.setStatus(user, state);
+        msgStatus(state);
     }
 
-    public void createAccountCustomer(IClientService clientService, IClientView clientView, IUserService userService, IUserView userView) {
+    @Override
+    public void createAccountCustomer(IClientService clientService, IClientView clientView, IUserService userService,
+            IUserView userView) {
         if (isEmpty(clientService.findAllCustomerAvailable().size(), MSG_CLIENT)) {
             return;
         }

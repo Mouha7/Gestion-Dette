@@ -40,19 +40,21 @@ public class ArticleView extends ImpView<Article> implements IArticleView {
 
     @Override
     public Article getObject(List<Article> articles) {
-        Article article = new Article();
+        Article article;
         int choix;
         int count = articles.size();
         this.afficher(articles);
         do {
+            article = new Article();
             System.out.print("Choisissez un article par son id: ");
             choix = scanner.nextInt();
             article.setIdArticle(choix);
-            article = articleService.findBy(article);
-            if (article == null || choix >= count) {
-                System.out.println("Erreur, l'id est invalide.");
+            article = articleService.findBy(article, articles);
+            System.out.println(article);
+            if (article == null || choix > count) {
+                System.out.println("Erreur, l'id de l'article est invalide.");
             }
-        } while (article == null || choix >= count);
+        } while (article == null || choix > count);
         return article;
     }
 }

@@ -42,5 +42,4 @@ public class DetteService implements IDetteService {
     public List<Dette> getAllSoldes() {
         return detteRepository.selectAllSoldes();
     }
-    
 }

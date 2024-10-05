@@ -47,9 +47,8 @@ public class UserView extends ImpView<User> implements IUserView {
     public int typeRole() {
         String choix;
         do {
-            for (Role role : Role.values()) {
-                System.out.println("(" + (role.ordinal() + 1) + ")- " + role.name());
-            }
+            System.out.println("(1)- " + Role.values()[0].name());
+            System.out.println("(2)- " + Role.values()[1].name());
             System.out.print("Choisissez un type d'utilisateur : ");
             choix = scanner.nextLine();
             if (!choix.equals("1") && !choix.equals("2")) {
@@ -61,19 +60,21 @@ public class UserView extends ImpView<User> implements IUserView {
 
     @Override
     public User getObject(List<User> users) {
-        User user = new User();
+        User user;
         int choix;
         int count = users.size();
         this.afficher(users);
         do {
+            user = new User();
             System.out.print("Choisissez une user par son id: ");
             choix = scanner.nextInt();
             user.setIdUser(choix);
             user = userService.findBy(user);
-            if (user == null || choix >= count) {
+            System.out.println(count);
+            if (user == null || choix > count) {
                 System.out.println("Erreur, l'id est invalide.");
             }
-        } while (user == null || choix >= count);
+        } while (user == null || choix > count);
         return user;
     }
 }

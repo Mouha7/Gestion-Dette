@@ -27,7 +27,6 @@ public class UserRepository extends Repository<User> implements IUserRepository 
 
     @Override
     public User selectByLogin(String login, String password) {
-        System.out.println(selectAll());
         return selectAll().stream()
                 .filter(user -> user.getLogin().compareTo(login) == 0 && user.getPassword().compareTo(password) == 0)
                 .findFirst()
