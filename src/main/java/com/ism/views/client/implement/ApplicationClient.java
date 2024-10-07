@@ -2,10 +2,15 @@ package com.ism.views.client.implement;
 
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import com.ism.data.entities.DemandeDette;
 import com.ism.data.entities.Detail;
 import com.ism.data.entities.Dette;
 import com.ism.data.entities.User;
+import com.ism.data.enums.EtatDemandeDette;
+import com.ism.services.IArticleService;
 import com.ism.services.IDemandeDetteService;
 import com.ism.services.IDetteService;
 import com.ism.views.IDemandeDetteView;
@@ -14,13 +19,15 @@ import com.ism.views.client.IApplicationClient;
 import com.ism.views.implement.Application;
 
 public class ApplicationClient extends Application implements IApplicationClient {
+    private final IArticleService articleService;
     private final IDemandeDetteService demandeDetteService;
     private final IDemandeDetteView demandeDetteView;
     private final IDetteService detteService;
     private final IDetteView detteView;
     private final Scanner scanner;
 
-    public ApplicationClient(IDemandeDetteService demandeDetteService, IDemandeDetteView demandeDetteView, IDetteService detteService, IDetteView detteView, Scanner scanner) {
+    public ApplicationClient(IArticleService articleService, IDemandeDetteService demandeDetteService, IDemandeDetteView demandeDetteView, IDetteService detteService, IDetteView detteView, Scanner scanner) {
+        this.articleService = articleService;
         this.demandeDetteService = demandeDetteService;
         this.demandeDetteView = demandeDetteView;
         this.detteService = detteService;
@@ -57,7 +64,10 @@ public class ApplicationClient extends Application implements IApplicationClient
                     displayDette(detteService, detteView);
                     break;
                 case 2:
-                    saisirDette(demandeDetteService, demandeDetteView, user);
+                    saisirDette(articleService, demandeDetteService, demandeDetteView, user);
+                    break;
+                case 3:
+                    displayDemandeDette(demandeDetteService, demandeDetteView);
                     break;
                 default:
                     System.out.println(MSG_EXIT);
@@ -72,10 +82,10 @@ public class ApplicationClient extends Application implements IApplicationClient
             return;
         }
         System.out.println("Choisissez l'id pour plus de detail");
-        System.out.println("--------------------");
+        splice();
         detteView.afficher(detteService.findAll());
         Dette dette = detteView.getObject(detteService.findAll());
-        System.out.println("--------------------");
+        splice();
         subMenu(dette);
     }
 
@@ -110,10 +120,54 @@ public class ApplicationClient extends Application implements IApplicationClient
     }
 
     @Override
-    public void saisirDette(IDemandeDetteService demandeDetteService, IDemandeDetteView demandeDetteView, User user) {
-        if (demandeDetteView.saisir(user) != null) {
-            demandeDetteService.add(demandeDetteView.saisir(user));
+    public void saisirDette(IArticleService articleService, IDemandeDetteService demandeDetteService, IDemandeDetteView demandeDetteView, User user) {
+        if (demandeDetteView.saisir(articleService, user) != null) {
+            demandeDetteService.add(demandeDetteView.saisir(articleService, user));
             msgSuccess("Demande de dette ajoutée avec succès.");
         }
+    }
+
+    @Override
+    public void displayDemandeDette(IDemandeDetteService demandeDetteService, IDemandeDetteView demandeDetteView) {
+        if (isEmpty(demandeDetteService.length(), "Aucune demande de dette n'a été enregistrée.")) {
+            return;
+        }
+        demandeDetteView.afficher(demandeDetteService.findAll());
+        splice();
+        subMenuDemandeDette(demandeDetteService, demandeDetteView);
+    }
+
+    @Override
+    public void subMenuDemandeDette(IDemandeDetteService demandeDetteService, IDemandeDetteView demandeDetteView) {
+        String choice;
+        System.out.println("Filtrer par: ");
+        System.out.println("1- En cour la demande");
+        System.out.println("2- Annuler la demande");
+        do {
+            System.out.print(MSG_CHOICE);
+            choice = scanner.nextLine();
+            if (choice.equals("1")) {
+                List<DemandeDette> demandeDettes = demandeDetteService.findAll().stream().filter(dette -> dette.getEtat().name().compareTo("ENCOURS") == 0).collect(Collectors.toList());
+                demandeDetteView.afficher(demandeDettes);
+            } else if (choice.equals("2")) {
+                List<DemandeDette> demandeDettes = demandeDetteService.findAll().stream().filter(dette -> dette.getEtat().name().compareTo("ANNULE") == 0).collect(Collectors.toList());
+                demandeDetteView.afficher(demandeDettes);
+            } else {
+                System.out.println("Erreur, choix invalide.");
+            }
+        } while (!choice.equals("1") || !choice.equals("2"));
+    }
+
+    public void relaunchDette(IDemandeDetteService demandeDetteService, IDemandeDetteView demandeDetteView) {
+        List<DemandeDette> demandeDettes = demandeDetteService.findAll().stream().filter(dette -> dette.getEtat().name().compareTo("ANNULE") == 0).collect(Collectors.toList());
+        if (isEmpty(demandeDettes.size(), "Aucune demande de dette annulée n'a été trouvée.")) {
+            return;
+        }
+        demandeDetteView.afficher(demandeDettes);
+        splice();
+        DemandeDette demandeDette = demandeDetteView.getObject(demandeDettes);
+        demandeDette.setEtat(EtatDemandeDette.ENCOURS);
+        demandeDetteService.update(demandeDette);
+        msgSuccess("Relancement de la demande de dette avec succès.");
     }
 }

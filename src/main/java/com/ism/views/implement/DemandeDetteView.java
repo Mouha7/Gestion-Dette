@@ -1,7 +1,6 @@
 package com.ism.views.implement;
 
 import java.util.List;
-import java.util.regex.Pattern;
 import java.time.LocalDate;
 
 import com.ism.data.entities.Article;
@@ -23,56 +22,109 @@ public class DemandeDetteView extends ImpView<DemandeDette> implements IDemandeD
     private IArticleService articleService;
 
     public DemandeDetteView(IDemandeDetteService demandeDetteService, IArticleService articleService, IDemandeArticleService demandeArticleService, IClientService clientService) {
+        this.articleService = articleService;
         this.clientService = clientService;
         this.demandeArticleService = demandeArticleService;
         this.demandeDetteService = demandeDetteService;
-        this.articleService = articleService;
     }
 
     @Override
-    public DemandeDette saisir(User user) {
-        Article article;
-        String choice;  
-        String qte;
-        DemandeArticle demandeArticle;
-        DemandeDette demandeDette = new DemandeDette();
-        Client client = new Client();
-        articleService.findAll();
+    public DemandeDette saisir(IArticleService articleService, User user) {
+        List<Article> articleAvailable = articleService.findAllAvailable();
+        if (articleAvailable.isEmpty()) {
+            System.out.println("Aucun article n'a été enregistré.");
+            return null;
+        }
+        DemandeDette demandeDette = initializeDemandeDette(user);
+        String choice;
         do {
-            article = new Article();
-            demandeArticle = new DemandeArticle();
-            if (articleService.length() == 0) {
-                System.out.println("Aucun article n'a été enregistré.");
-                return null;
-            }
-            articleService.findAll().forEach(System.out::println);
-            System.out.print("Entrez le libelle de l'article de la demande de dette(0 pour terminer): ");
-            choice = scanner.nextLine();
-            System.out.println("Entrez la quantité: ");
-            qte = scanner.nextLine();
-            article.setLibelle(choice);
-            article = articleService.findBy(article, articleService.findAll());
-            Pattern digitPattern = Pattern.compile("\\d+");
-            if (!digitPattern.matcher(qte).matches()) {
-                System.out.println("Erreur, la quantité est incorrecte.");
-            } else if (!choice.equals("0")) {
-                client.setUser(user);
-                demandeDette.setMontantTotal(article.getPrix() *  Integer.parseInt(qte));
-                demandeDette.setEtat(EtatDemandeDette.ENCOURS);
-                demandeDette.setDateDemande(LocalDate.now());
-                demandeDette.setClient(clientService.findBy(client));
-
-                demandeArticle.setQteArticle(Integer.parseInt(qte));
-                demandeArticle.setArticle(article);
-                demandeArticle.setDemandeDette(demandeDette);
-                
-                demandeDette.addDemandeArticle(demandeArticle);
-
-                // Add Nav
-                demandeArticleService.add(demandeArticle);
+            displayAvailableArticles(articleAvailable);
+            choice = getUserChoice();
+            if (!choice.equals("0")) {
+                processArticleChoice(choice, articleAvailable, demandeDette);
             }
         } while (!choice.equals("0"));
         return demandeDette;
+    }
+
+    private DemandeDette initializeDemandeDette(User user) {
+        DemandeDette demandeDette = new DemandeDette();
+        Client client = new Client();
+        client.setUser(user);
+        demandeDette.setClient(clientService.findBy(client));
+        demandeDette.setEtat(EtatDemandeDette.ANNULE); // Pour les testes du 4
+        demandeDette.setDateDemande(LocalDate.now());
+        return demandeDette;
+    }
+
+    private void displayAvailableArticles(List<Article> articleAvailable) {
+        articleAvailable.forEach(System.out::println);
+    }
+
+    private String getUserChoice() {
+        System.out.print("Entrez le libelle de l'article de la demande de dette(0 pour terminer): ");
+        return scanner.nextLine();
+    }
+
+    private void processArticleChoice(String choice, List<Article> articleAvailable, DemandeDette demandeDette) {
+        int quantity = getValidQuantity();
+        if (quantity == -1) return;
+
+        Article article = findArticle(choice, articleAvailable);
+        if (article == null) return;
+
+        if (!checkStock(article, quantity)) return;
+
+        updateArticleStock(article, quantity);
+        addDemandeArticle(article, quantity, demandeDette);
+    }
+
+    private int getValidQuantity() {
+        System.out.print("Entrez la quantité: ");
+        String qte = scanner.nextLine();
+        
+        if (!qte.matches("\\d+")) {
+            System.out.println("Erreur, la quantité est incorrecte.");
+            return -1;
+        }
+        
+        return Integer.parseInt(qte);
+    }
+
+    private Article findArticle(String libelle, List<Article> articleAvailable) {
+        Article article = new Article();
+        article.setLibelle(libelle);
+        Article foundArticle = articleService.findBy(article, articleAvailable);
+        
+        if (foundArticle == null) {
+            System.out.println("Article non trouvé.");
+        }
+        
+        return foundArticle;
+    }
+
+    private boolean checkStock(Article article, int quantity) {
+        if (article.getQteStock() < quantity) {
+            System.out.println("Quantité insuffisante en stock.");
+            return false;
+        }
+        return true;
+    }
+
+    private void updateArticleStock(Article article, int quantity) {
+        article.setQteStock(article.getQteStock() - quantity);
+    }
+
+    private void addDemandeArticle(Article article, int quantity, DemandeDette demandeDette) {
+        DemandeArticle demandeArticle = new DemandeArticle();
+        demandeArticle.setQteArticle(quantity);
+        demandeArticle.setArticle(article);
+        demandeArticle.setDemandeDette(demandeDette);
+        
+        demandeDette.addDemandeArticle(demandeArticle);
+        demandeDette.setMontantTotal(demandeDette.getMontantTotal() + (article.getPrix() * quantity));
+        
+        demandeArticleService.add(demandeArticle);
     }
 
     @Override

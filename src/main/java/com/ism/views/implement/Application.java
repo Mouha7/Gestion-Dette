@@ -24,4 +24,9 @@ public abstract class Application implements IApplication {
     public void msgSuccess(String msg) {
         System.out.println(msg);
     }
+
+    @Override
+    public void splice() {
+        System.out.println("--------------------");
+    }
 }

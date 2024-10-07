@@ -9,7 +9,7 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
+@ToString(exclude = { "details", "demandeArticles" })
 @EqualsAndHashCode
 public class Article {
     private int idArticle;
@@ -18,7 +18,7 @@ public class Article {
     private Integer qteStock;
     private static int nbr;
 
-    // Nav
+    // Nav ==> ce n'est pas utile
     private List<Detail> details;
     private List<DemandeArticle> demandeArticles;
 

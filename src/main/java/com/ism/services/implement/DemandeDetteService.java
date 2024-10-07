@@ -37,5 +37,9 @@ public class DemandeDetteService implements IDemandeDetteService {
     public int length() {
         return demandeDetteRepository.size();
     }
-    
+
+    @Override
+    public void update(DemandeDette demandeDette) {
+        demandeDetteRepository.selectUpdate(demandeDette);
+    }
 }

@@ -8,4 +8,5 @@ public interface IApplication {
     void msgSuccess();
     void msgSuccess(String msg);
     boolean isEmpty(int size, String msg);
+    void splice();
 }

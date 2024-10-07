@@ -34,7 +34,7 @@ public class Router implements IRouter {
     private final IDetteView detteView;
     private final IUserService userService;
     private final IUserView userView;
-    
+
     private final IApplicationAdmin appAdmin;
     private final IApplicationClient appClient;
     private final Scanner scanner;
@@ -54,7 +54,7 @@ public class Router implements IRouter {
         this.scanner = scanner;
 
         this.appAdmin = new ApplicationAdmin(this.articleService, this.articleView, this.clientService, this.clientView, this.detteService, this.detteView, this.userService, this.userView, this.scanner);
-        this.appClient = new ApplicationClient(this.demandeDetteService, this.demandeDetteView, this.detteService, this.detteView, this.scanner);
+        this.appClient = new ApplicationClient(this.articleService, this.demandeDetteService, this.demandeDetteView, this.detteService, this.detteView, this.scanner);
         this.conn = new Connexion(this.userService, this.scanner);
     }
 

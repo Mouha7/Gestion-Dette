@@ -2,6 +2,7 @@ package com.ism.data.entities;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
 
 import com.ism.data.enums.EtatDemandeDette;
 
@@ -22,7 +23,7 @@ public class DemandeDette {
     private static int nbr;
 
     // Nav
-    private List<DemandeArticle> demandeArticles;
+    private List<DemandeArticle> demandeArticles = new ArrayList<>();
     private Dette dette;
     private Client client;
 
