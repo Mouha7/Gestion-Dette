@@ -9,4 +9,7 @@ public interface IApplication {
     void msgSuccess(String msg);
     boolean isEmpty(int size, String msg);
     void splice();
+    boolean isDigit(String number);
+    boolean isDecimal(String number);
+    boolean isInteger(String number);
 }

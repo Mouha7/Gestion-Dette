@@ -10,7 +10,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = {"demandeDettes", "dettes"})
 public class Client {
     private int idClient;
     private String surname;

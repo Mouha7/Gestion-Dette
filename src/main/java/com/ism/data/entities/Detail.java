@@ -13,8 +13,13 @@ public class Detail {
     private int idDetteArticle;
     private int qte;
     private Double prixVente;
+    private static int nbr;
 
     // Nav
     private Article article;
     private Dette dette;
+
+    public Detail() {
+        this.idDetteArticle = ++nbr;
+    }
 }

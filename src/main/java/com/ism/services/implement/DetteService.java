@@ -42,4 +42,14 @@ public class DetteService implements IDetteService {
     public List<Dette> getAllSoldes() {
         return detteRepository.selectAllSoldes();
     }
+
+    public void update(List<Dette> dettes, Dette dette) {
+        dettes.stream()
+                .map(d -> {
+                    if (d.getIdDette() == dette.getIdDette()) {
+                        return dette;
+                    }
+                    return d;
+                });
+    }
 }

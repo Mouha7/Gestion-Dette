@@ -44,6 +44,19 @@ public class ClientService implements IClientService {
     }
 
     @Override
+    public Client findBy(List<Client> clients, Client client) {
+        for (Client cl : clients) {
+            if(cl.getUser().getIdUser() == client.getUser().getIdUser()) {
+                return cl;
+            }
+            if (cl.getTel() != null && cl.getTel().compareTo(client.getTel()) == 0) {
+                return cl;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public void setStatus(Client client, boolean state) {
         clientRepository.changeStatus(client, state);
     }

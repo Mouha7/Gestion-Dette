@@ -5,6 +5,7 @@ import com.ism.services.IClientService;
 import com.ism.services.IDemandeArticleService;
 import com.ism.services.IDemandeDetteService;
 import com.ism.services.IDetteService;
+import com.ism.services.IPaiementService;
 import com.ism.services.IUserService;
 
 public interface IFactoryService {
@@ -13,5 +14,6 @@ public interface IFactoryService {
     IDemandeArticleService getInstanceDemandeArticleService();
     IDemandeDetteService getInstanceDemandeDetteService();
     IDetteService getInstanceDetteService();
+    IPaiementService getInstancePaiementService();
     IUserService getInstanceUserService();
 }

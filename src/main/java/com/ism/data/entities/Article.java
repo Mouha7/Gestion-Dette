@@ -1,5 +1,6 @@
 package com.ism.data.entities;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.EqualsAndHashCode;
@@ -27,6 +28,9 @@ public class Article {
     }
 
     public void addDetail(Detail detail) {
+        if (demandeArticles == null) {
+            details = new ArrayList<>();
+        }
         details.add(detail);
     }
 

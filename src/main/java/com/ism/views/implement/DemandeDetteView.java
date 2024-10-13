@@ -21,7 +21,8 @@ public class DemandeDetteView extends ImpView<DemandeDette> implements IDemandeD
     private IDemandeDetteService demandeDetteService;
     private IArticleService articleService;
 
-    public DemandeDetteView(IDemandeDetteService demandeDetteService, IArticleService articleService, IDemandeArticleService demandeArticleService, IClientService clientService) {
+    public DemandeDetteView(IDemandeDetteService demandeDetteService, IArticleService articleService,
+            IDemandeArticleService demandeArticleService, IClientService clientService) {
         this.articleService = articleService;
         this.clientService = clientService;
         this.demandeArticleService = demandeArticleService;
@@ -47,11 +48,33 @@ public class DemandeDetteView extends ImpView<DemandeDette> implements IDemandeD
         return demandeDette;
     }
 
+    @Override
+    public void afficher(List<DemandeDette> list) {
+        for (DemandeDette demandeDette : list) {
+            System.out.println("ID: " + demandeDette.getIdDemandeDette());
+            System.out.println("Date: " + demandeDette.getDateDemande());
+            System.out.println("Montant total: " + demandeDette.getMontantTotal() + " Franc CFA");
+            System.out.println("État: " + demandeDette.getEtat());
+            System.out.println("Client: "
+                    + (demandeDette.getClient() != null ? demandeDette.getClient().getUser().getLogin() : "N/A"));
+            System.out.println("---Articles demandés---");
+            for (DemandeArticle da : demandeDette.getDemandeArticles()) {
+                System.out.println(
+                        "  - Libelle: " + da.getArticle().getLibelle() + " (Quantité: " + da.getQteArticle() + ")");
+            }
+        }
+    }
+
     private DemandeDette initializeDemandeDette(User user) {
         DemandeDette demandeDette = new DemandeDette();
         Client client = new Client();
         client.setUser(user);
-        demandeDette.setClient(clientService.findBy(client));
+        if (clientService.findBy(client) == null) {
+            client.setUser(user);
+            demandeDette.setClient(client);
+        } else {
+            demandeDette.setClient(clientService.findBy(client));
+        }
         demandeDette.setEtat(EtatDemandeDette.ANNULE); // Pour les testes du 4
         demandeDette.setDateDemande(LocalDate.now());
         return demandeDette;
@@ -62,18 +85,21 @@ public class DemandeDetteView extends ImpView<DemandeDette> implements IDemandeD
     }
 
     private String getUserChoice() {
-        System.out.print("Entrez le libelle de l'article de la demande de dette(0 pour terminer): ");
+        System.out.print("Entrez l'id de l'article de la demande de dette(0 pour terminer): ");
         return scanner.nextLine();
     }
 
     private void processArticleChoice(String choice, List<Article> articleAvailable, DemandeDette demandeDette) {
         int quantity = getValidQuantity();
-        if (quantity == -1) return;
+        if (quantity <= -1)
+            return;
 
         Article article = findArticle(choice, articleAvailable);
-        if (article == null) return;
+        if (article == null)
+            return;
 
-        if (!checkStock(article, quantity)) return;
+        if (!checkStock(article, quantity))
+            return;
 
         updateArticleStock(article, quantity);
         addDemandeArticle(article, quantity, demandeDette);
@@ -82,24 +108,26 @@ public class DemandeDetteView extends ImpView<DemandeDette> implements IDemandeD
     private int getValidQuantity() {
         System.out.print("Entrez la quantité: ");
         String qte = scanner.nextLine();
-        
+
         if (!qte.matches("\\d+")) {
             System.out.println("Erreur, la quantité est incorrecte.");
             return -1;
         }
-        
+
         return Integer.parseInt(qte);
     }
 
-    private Article findArticle(String libelle, List<Article> articleAvailable) {
+    private Article findArticle(String id, List<Article> articleAvailable) {
         Article article = new Article();
-        article.setLibelle(libelle);
+        if (id.matches("\\d")) {
+            article.setIdArticle(Integer.parseInt(id));
+        }
         Article foundArticle = articleService.findBy(article, articleAvailable);
-        
+
         if (foundArticle == null) {
             System.out.println("Article non trouvé.");
         }
-        
+
         return foundArticle;
     }
 
@@ -120,30 +148,36 @@ public class DemandeDetteView extends ImpView<DemandeDette> implements IDemandeD
         demandeArticle.setQteArticle(quantity);
         demandeArticle.setArticle(article);
         demandeArticle.setDemandeDette(demandeDette);
-        
+
+        demandeDette.setMontantTotal((article.getPrix() * quantity));
+
+        demandeArticle.setDemandeDette(demandeDette);
         demandeDette.addDemandeArticle(demandeArticle);
-        demandeDette.setMontantTotal(demandeDette.getMontantTotal() + (article.getPrix() * quantity));
-        
+
         demandeArticleService.add(demandeArticle);
     }
 
     @Override
     public DemandeDette getObject(List<DemandeDette> list) {
         DemandeDette demandeDette;
-        int choix;
+        String choix;
         int count = list.size();
         this.afficher(list);
         do {
             demandeDette = new DemandeDette();
             System.out.print("Choisissez une demande de dette par son id: ");
-            choix = scanner.nextInt();
-            demandeDette.setIdDemandeDette(choix);
-            demandeDette = demandeDetteService.findBy(demandeDette);
-            System.out.println(count);
-            if (demandeDette == null || choix > count) {
+            choix = scanner.nextLine();
+            if (isInteger(choix)) {
+                demandeDette.setIdDemandeDette(Integer.parseInt(choix));
+                demandeDette = demandeDetteService.findBy(demandeDette);
+            } else {
+                continue;
+            }
+            if (demandeDette == null || Integer.parseInt(choix) > count) {
                 System.out.println("Erreur, l'id est invalide.");
             }
-        } while (demandeDette == null || choix > count);
+
+        } while (demandeDette == null);
         return demandeDette;
     }
 
@@ -152,5 +186,27 @@ public class DemandeDetteView extends ImpView<DemandeDette> implements IDemandeD
         // Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'saisir'");
     }
-    
+
+    @Override
+    public DemandeDette getObject(List<DemandeDette> list, IDemandeDetteService demandeDetteService) {
+        DemandeDette demandeDette;
+        String choix;
+        int count = list.size();
+        this.afficher(list);
+        do {
+            demandeDette = new DemandeDette();
+            System.out.print("Choisissez une demande de dette par son id: ");
+            choix = scanner.nextLine();
+            if (choix.matches("\\d")) {
+                demandeDette.setIdDemandeDette(Integer.parseInt(choix));
+                demandeDette = demandeDetteService.findBy(list, demandeDette);
+            }
+            if (demandeDette == null || Integer.parseInt(choix) > count) {
+                System.out.println("Erreur, l'id est invalide.");
+            }
+
+        } while (demandeDette == null || Integer.parseInt(choix) > count);
+        return demandeDette;
+    }
+
 }

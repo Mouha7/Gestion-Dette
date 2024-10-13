@@ -6,12 +6,14 @@ import com.ism.data.repository.IClientRepository;
 import com.ism.data.repository.IDemandeArticleRepository;
 import com.ism.data.repository.IDemandeDetteRepository;
 import com.ism.data.repository.IDetteRepository;
+import com.ism.data.repository.IPaiementRepository;
 import com.ism.data.repository.IUserRepository;
 import com.ism.data.repository.implement.ArticleRepository;
 import com.ism.data.repository.implement.ClientRepository;
 import com.ism.data.repository.implement.DemandeArticleRepository;
 import com.ism.data.repository.implement.DemandeDetteRepository;
 import com.ism.data.repository.implement.DetteRepository;
+import com.ism.data.repository.implement.PaiementRepository;
 import com.ism.data.repository.implement.UserRepository;
 
 public class FactoryRepository implements IFactoryRepository {
@@ -20,6 +22,7 @@ public class FactoryRepository implements IFactoryRepository {
     private IDemandeArticleRepository demandeArticleRepository;
     private IDemandeDetteRepository demandeDetteRepository;
     private IDetteRepository detteRepository;
+    private IPaiementRepository paiementRepository;
     private IUserRepository userRepository;
 
     @Override
@@ -45,6 +48,11 @@ public class FactoryRepository implements IFactoryRepository {
     @Override
     public IDetteRepository getInstanceDetteRepository() {
         return detteRepository == null ? new DetteRepository() : detteRepository;
+    }
+
+    @Override
+    public IPaiementRepository getInstancePaiementRepository() {
+        return paiementRepository == null ? new PaiementRepository() : paiementRepository;
     }
 
     @Override

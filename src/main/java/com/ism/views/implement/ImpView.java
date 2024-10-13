@@ -16,4 +16,22 @@ public abstract class ImpView<T> implements IView<T> {
     public void afficher(List<T> list) {
         list.forEach(System.out::println);
     }
+    
+    protected boolean isInteger(String number) {
+        try {
+            Integer.parseInt(number);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    protected boolean isDecimal(String number) {
+        try {
+            Double.parseDouble(number);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 }

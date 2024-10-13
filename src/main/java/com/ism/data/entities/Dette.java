@@ -22,12 +22,21 @@ public class Dette {
     private boolean status;
     private EtatDette etat;
     private LocalDate dateCreation;
+    private static int nbr;
 
     // Nav
     private Client client;
-    private DemandeDette demandeDette;
+    private DemandeDette demandeDette; // Pas pertinent pour le moment pour la navigabilité
     private List<Paiement> paiements;
     private List<Detail> details;
+
+    public Dette() {
+        this.idDette = ++nbr;
+        this.dateCreation = LocalDate.now();
+        this.montantTotal = 0.0;
+        this.montantVerser = 0.0;
+        this.montantRestant = this.montantTotal - this.montantVerser;
+    }
 
     public void addPaiement(Paiement paiement) {
         paiements.add(paiement);

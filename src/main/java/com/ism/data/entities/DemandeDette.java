@@ -33,5 +33,7 @@ public class DemandeDette {
 
     public DemandeDette() {
         this.idDemandeDette = ++nbr;
+        this.dateDemande = LocalDate.now();
+        this.montantTotal = 0.0;
     }
 }

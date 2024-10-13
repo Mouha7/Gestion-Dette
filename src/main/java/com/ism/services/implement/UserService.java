@@ -34,6 +34,16 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public User findBy(List<User> users, User user) {
+        for (User us : users) {
+            if (us.getIdUser() == user.getIdUser()) {
+                return us;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public void setStatus(User user, boolean state) {
         userRepository.changeStatus(user, state);
     }

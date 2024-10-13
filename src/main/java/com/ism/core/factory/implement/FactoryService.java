@@ -7,12 +7,14 @@ import com.ism.services.IClientService;
 import com.ism.services.IDemandeArticleService;
 import com.ism.services.IDemandeDetteService;
 import com.ism.services.IDetteService;
+import com.ism.services.IPaiementService;
 import com.ism.services.IUserService;
 import com.ism.services.implement.ArticleService;
 import com.ism.services.implement.ClientService;
 import com.ism.services.implement.DemandeArticleService;
 import com.ism.services.implement.DemandeDetteService;
 import com.ism.services.implement.DetteService;
+import com.ism.services.implement.PaiementService;
 import com.ism.services.implement.UserService;
 
 public class FactoryService implements IFactoryService {
@@ -21,6 +23,7 @@ public class FactoryService implements IFactoryService {
     private IDemandeArticleService demandeArticleService;
     private IDemandeDetteService demandeDetteService;
     private IDetteService detteService;
+    private IPaiementService paiementService;
     private IUserService userService;
     private IFactoryRepository factoryRepository;
 
@@ -51,6 +54,11 @@ public class FactoryService implements IFactoryService {
     @Override
     public IDetteService getInstanceDetteService() {
         return detteService == null ? new DetteService(factoryRepository.getInstanceDetteRepository()) : detteService;
+    }
+
+    @Override
+    public IPaiementService getInstancePaiementService() {
+        return paiementService == null? new PaiementService(factoryRepository.getInstancePaiementRepository()) : paiementService;
     }
 
     @Override

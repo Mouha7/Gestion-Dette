@@ -33,6 +33,15 @@ public class DemandeDetteService implements IDemandeDetteService {
         return null;
     }
 
+    public DemandeDette findBy(List<DemandeDette> demandeDettes,DemandeDette demandeDette) {
+        for (DemandeDette dette : demandeDettes) {
+            if (dette.getIdDemandeDette() == demandeDette.getIdDemandeDette()) {
+                return dette;
+            }
+        }
+        return null;
+    }
+
     @Override
     public int length() {
         return demandeDetteRepository.size();

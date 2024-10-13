@@ -2,7 +2,6 @@ package com.ism.views.implement;
 
 import java.util.List;
 
-import com.ism.data.entities.Client;
 import com.ism.data.entities.User;
 import com.ism.data.enums.Role;
 import com.ism.services.IUserService;
@@ -16,7 +15,7 @@ public class UserView extends ImpView<User> implements IUserView {
     }
 
     @Override
-    public User accountCustomer(Client client) {
+    public User accountCustomer() {
         User user = new User();
         System.out.print("Entrez l'email : ");
         user.setEmail(scanner.nextLine());

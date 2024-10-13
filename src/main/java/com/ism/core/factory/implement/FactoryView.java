@@ -6,11 +6,13 @@ import com.ism.views.IArticleView;
 import com.ism.views.IClientView;
 import com.ism.views.IDemandeDetteView;
 import com.ism.views.IDetteView;
+import com.ism.views.IPaiementView;
 import com.ism.views.IUserView;
 import com.ism.views.implement.ArticleView;
 import com.ism.views.implement.ClientView;
 import com.ism.views.implement.DemandeDetteView;
 import com.ism.views.implement.DetteView;
+import com.ism.views.implement.PaiementView;
 import com.ism.views.implement.UserView;
 
 public class FactoryView implements IFactoryView {
@@ -18,6 +20,7 @@ public class FactoryView implements IFactoryView {
     private IClientView clientView;
     private IDemandeDetteView demandeDetteView;
     private IDetteView detteView;
+    private IPaiementView paiementView;
     private IUserView userView;
     private IFactoryService factoryService;
 
@@ -32,7 +35,7 @@ public class FactoryView implements IFactoryView {
 
     @Override
     public IClientView getInstanceClientView() {
-        return clientView == null ? new ClientView(factoryService.getInstanceClientService()) : clientView;
+        return clientView == null ? new ClientView(factoryService.getInstanceClientService(), getInstanceUserView()) : clientView;
     }
 
     @Override
@@ -43,6 +46,11 @@ public class FactoryView implements IFactoryView {
     @Override
     public IDetteView getInstanceDetteView() {
         return detteView == null ? new DetteView(factoryService.getInstanceDetteService()) : detteView;
+    }
+
+    @Override
+    public IPaiementView getInstancePaiementView() {
+        return paiementView == null ? new PaiementView(factoryService.getInstancePaiementService()) : paiementView;
     }
 
     @Override

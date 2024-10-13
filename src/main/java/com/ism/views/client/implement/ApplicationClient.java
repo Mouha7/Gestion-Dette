@@ -69,6 +69,9 @@ public class ApplicationClient extends Application implements IApplicationClient
                 case 3:
                     displayDemandeDette(demandeDetteService, demandeDetteView);
                     break;
+                case 4:
+                    relaunchDette(demandeDetteService, demandeDetteView);
+                    break;
                 default:
                     System.out.println(MSG_EXIT);
                     break;
@@ -121,10 +124,12 @@ public class ApplicationClient extends Application implements IApplicationClient
 
     @Override
     public void saisirDette(IArticleService articleService, IDemandeDetteService demandeDetteService, IDemandeDetteView demandeDetteView, User user) {
-        if (demandeDetteView.saisir(articleService, user) != null) {
-            demandeDetteService.add(demandeDetteView.saisir(articleService, user));
-            msgSuccess("Demande de dette ajoutée avec succès.");
+        DemandeDette dette = demandeDetteView.saisir(articleService, user);
+        if (dette == null) {
+            return;
         }
+        demandeDetteService.add(dette);
+        msgSuccess("Demande de dette ajoutée avec succès.");
     }
 
     @Override
@@ -133,8 +138,12 @@ public class ApplicationClient extends Application implements IApplicationClient
             return;
         }
         demandeDetteView.afficher(demandeDetteService.findAll());
+        System.out.print("Voulez-vous filtrer les demandes de dette(O/N): ");
+        char choix = scanner.nextLine().charAt(0);
+        if (choix == 'O' || choix == 'o') {
+            subMenuDemandeDette(demandeDetteService, demandeDetteView);
+        }
         splice();
-        subMenuDemandeDette(demandeDetteService, demandeDetteView);
     }
 
     @Override
@@ -143,29 +152,26 @@ public class ApplicationClient extends Application implements IApplicationClient
         System.out.println("Filtrer par: ");
         System.out.println("1- En cour la demande");
         System.out.println("2- Annuler la demande");
-        do {
-            System.out.print(MSG_CHOICE);
-            choice = scanner.nextLine();
-            if (choice.equals("1")) {
-                List<DemandeDette> demandeDettes = demandeDetteService.findAll().stream().filter(dette -> dette.getEtat().name().compareTo("ENCOURS") == 0).collect(Collectors.toList());
-                demandeDetteView.afficher(demandeDettes);
-            } else if (choice.equals("2")) {
-                List<DemandeDette> demandeDettes = demandeDetteService.findAll().stream().filter(dette -> dette.getEtat().name().compareTo("ANNULE") == 0).collect(Collectors.toList());
-                demandeDetteView.afficher(demandeDettes);
-            } else {
-                System.out.println("Erreur, choix invalide.");
-            }
-        } while (!choice.equals("1") || !choice.equals("2"));
+        System.out.print(MSG_CHOICE);
+        choice = scanner.nextLine();
+        if (choice.equals("1")) {
+            List<DemandeDette> demandeDettes = demandeDetteService.findAll().stream().filter(dette -> dette.getEtat().name().compareTo("ENCOURS") == 0).collect(Collectors.toList());
+            demandeDetteView.afficher(demandeDettes);
+        } else if (choice.equals("2")) {
+            List<DemandeDette> demandeDettes = demandeDetteService.findAll().stream().filter(dette -> dette.getEtat().name().compareTo("ANNULE") == 0).collect(Collectors.toList());
+            demandeDetteView.afficher(demandeDettes);
+        } else {
+            System.out.println("Erreur, choix invalide.");
+        }
     }
 
+    @Override
     public void relaunchDette(IDemandeDetteService demandeDetteService, IDemandeDetteView demandeDetteView) {
         List<DemandeDette> demandeDettes = demandeDetteService.findAll().stream().filter(dette -> dette.getEtat().name().compareTo("ANNULE") == 0).collect(Collectors.toList());
         if (isEmpty(demandeDettes.size(), "Aucune demande de dette annulée n'a été trouvée.")) {
             return;
         }
-        demandeDetteView.afficher(demandeDettes);
-        splice();
-        DemandeDette demandeDette = demandeDetteView.getObject(demandeDettes);
+        DemandeDette demandeDette = demandeDetteView.getObject(demandeDettes, demandeDetteService);
         demandeDette.setEtat(EtatDemandeDette.ENCOURS);
         demandeDetteService.update(demandeDette);
         msgSuccess("Relancement de la demande de dette avec succès.");

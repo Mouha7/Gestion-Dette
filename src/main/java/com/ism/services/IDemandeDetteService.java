@@ -10,4 +10,5 @@ public interface IDemandeDetteService{
     DemandeDette findBy(DemandeDette demandeDette);
     int length();
     void update(DemandeDette demandeDette);
+    DemandeDette findBy(List<DemandeDette> demandeDettes,DemandeDette demandeDette);
 }

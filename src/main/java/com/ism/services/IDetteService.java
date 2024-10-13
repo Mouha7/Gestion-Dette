@@ -11,4 +11,5 @@ public interface IDetteService {
     Dette findBy(Dette dette);
     void setStatus(Dette dette, boolean state);
     List<Dette> getAllSoldes();
+    void update(List<Dette> dettes, Dette dette);
 }

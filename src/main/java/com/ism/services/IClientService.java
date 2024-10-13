@@ -9,6 +9,7 @@ public interface IClientService {
     List<Client> findAll();
     int length();
     Client findBy(Client client);
+    Client findBy(List<Client> clients, Client client);
     void setStatus(Client client, boolean state);
     List<Client> getAllActifs();
     boolean findByTel(String client);

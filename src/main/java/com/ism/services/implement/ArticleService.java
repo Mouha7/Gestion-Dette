@@ -44,7 +44,7 @@ public class ArticleService implements IArticleService {
             if (value.getIdArticle() == article.getIdArticle()) {
                 return value;
             }
-            if (value.getLibelle().compareTo(article.getLibelle()) == 0) {
+            if (article.getLibelle() != null && value.getLibelle().compareTo(article.getLibelle()) == 0) {
                 return value;
             }
         }

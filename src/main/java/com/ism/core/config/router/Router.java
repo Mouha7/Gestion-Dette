@@ -10,11 +10,13 @@ import com.ism.services.IArticleService;
 import com.ism.services.IClientService;
 import com.ism.services.IDemandeDetteService;
 import com.ism.services.IDetteService;
+import com.ism.services.IPaiementService;
 import com.ism.services.IUserService;
 import com.ism.views.IArticleView;
 import com.ism.views.IClientView;
 import com.ism.views.IDemandeDetteView;
 import com.ism.views.IDetteView;
+import com.ism.views.IPaiementView;
 import com.ism.views.IUserView;
 import com.ism.views.admin.IApplicationAdmin;
 import com.ism.views.admin.implement.ApplicationAdmin;
@@ -32,11 +34,14 @@ public class Router implements IRouter {
     private final IDemandeDetteView demandeDetteView;
     private final IDetteService detteService;
     private final IDetteView detteView;
+    private final IPaiementService paiementService;
+    private final IPaiementView paiementView;
     private final IUserService userService;
     private final IUserView userView;
 
     private final IApplicationAdmin appAdmin;
     private final IApplicationClient appClient;
+    private final IApplicationStorekeeper appStorekeeper;
     private final Scanner scanner;
     private final IConnexion conn;
 
@@ -49,12 +54,15 @@ public class Router implements IRouter {
         this.demandeDetteView = factory.getFactoryView().getInstanceDemandeDetteView();
         this.detteService = factory.getFactoryService().getInstanceDetteService();
         this.detteView = factory.getFactoryView().getInstanceDetteView();
+        this.paiementService = factory.getFactoryService().getInstancePaiementService();
+        this.paiementView = factory.getFactoryView().getInstancePaiementView();
         this.userService = factory.getFactoryService().getInstanceUserService();
         this.userView = factory.getFactoryView().getInstanceUserView();
         this.scanner = scanner;
 
         this.appAdmin = new ApplicationAdmin(this.articleService, this.articleView, this.clientService, this.clientView, this.detteService, this.detteView, this.userService, this.userView, this.scanner);
         this.appClient = new ApplicationClient(this.articleService, this.demandeDetteService, this.demandeDetteView, this.detteService, this.detteView, this.scanner);
+        this.appStorekeeper = new ApplicationStorekeeper(this.articleService, this.articleView, this.clientService, this.clientView, this.userService, this.userView, this.detteService, this.detteView, this.paiementService, this.paiementView, this.scanner);
         this.conn = new Connexion(this.userService, this.scanner);
     }
 
@@ -71,7 +79,7 @@ public class Router implements IRouter {
                     appClient.run(user);
                     break;
                 case "BOUTIQUIER":
-                    IApplicationStorekeeper appStorekeeper = new ApplicationStorekeeper();
+                    appStorekeeper.run(user);
                     break;
                 default:
                     break;

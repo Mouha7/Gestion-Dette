@@ -8,6 +8,7 @@ public interface IUserService {
     boolean add(User value);
     List<User> findAll();
     User findBy(User user);
+    User findBy(List<User> users, User user);
     void setStatus(User user, boolean state);
     List<User> getAllActifs(int type);
     User getByLogin(String login, String password);

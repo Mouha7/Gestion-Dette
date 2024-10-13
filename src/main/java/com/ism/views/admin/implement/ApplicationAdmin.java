@@ -19,8 +19,6 @@ import com.ism.views.admin.IApplicationAdmin;
 import com.ism.views.implement.Application;
 
 public class ApplicationAdmin extends Application implements IApplicationAdmin {
-    private static final String MSG_CLIENT = "Aucun client n'a été enregistré.";
-    private static final String MSG_ACCOUNT = "Compte créer avec succès !";
     private final IArticleService articleService;
     private final IArticleView articleView;
     private final IClientService clientService;
@@ -263,7 +261,7 @@ public class ApplicationAdmin extends Application implements IApplicationAdmin {
             return;
         }
         Client client = clientView.getObject(clientService.findAllCustomerAvailable());
-        userService.add(userView.accountCustomer(client));
+        userService.add(userView.accountCustomer());
         msgSuccess(MSG_ACCOUNT);
     }
 

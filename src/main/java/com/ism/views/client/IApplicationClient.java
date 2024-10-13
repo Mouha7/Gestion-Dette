@@ -10,7 +10,6 @@ import com.ism.views.IDemandeDetteView;
 import com.ism.views.IDetteView;
 
 public interface IApplicationClient extends IApplication {
-    int menu();
     void displayDette(IDetteService detteService, IDetteView detteView);
     void displayPaiement(Dette dette);
     void displayArticle(Dette dette);
@@ -18,4 +17,5 @@ public interface IApplicationClient extends IApplication {
     void saisirDette(IArticleService articleService, IDemandeDetteService demandeDetteService, IDemandeDetteView demandeDetteView, User user);
     void displayDemandeDette(IDemandeDetteService demandeDetteService, IDemandeDetteView demandeDetteView);
     void subMenuDemandeDette(IDemandeDetteService demandeDetteService, IDemandeDetteView demandeDetteView);
+    void relaunchDette(IDemandeDetteService demandeDetteService, IDemandeDetteView demandeDetteView);
 }
