@@ -2,7 +2,9 @@ package com.ism.views.implement;
 
 import java.util.List;
 
+import com.ism.data.entities.Detail;
 import com.ism.data.entities.Dette;
+import com.ism.data.entities.Paiement;
 import com.ism.data.enums.EtatDette;
 import com.ism.services.IDetteService;
 import com.ism.views.IDetteView;
@@ -27,19 +29,23 @@ public class DetteView extends ImpView<Dette> implements IDetteView {
     @Override
     public Dette getObject(List<Dette> dettes) {
         Dette dette;
-        int choix;
+        String choix;
         int count = dettes.size();
-        this.afficher(dettes);
+        this.display(dettes);
         do {
             dette = new Dette();
             System.out.print("Choisissez une dette par son id: ");
-            choix = scanner.nextInt();
-            dette.setIdDette(choix);
-            dette = detteService.findBy(dette);
-            if (dette == null || choix > count) {
+            choix = scanner.nextLine();
+            if (isInteger(choix)) {
+                dette.setIdDette(Integer.parseInt(choix));
+                dette = detteService.findBy(dettes, dette);
+            } else {
+                continue;
+            }
+            if (dette == null || Integer.parseInt(choix) > count) {
                 System.out.println("Erreur, l'id est invalide.");
             }
-        } while (dette == null || choix > count);
+        } while (dette == null);
         return dette;
     }
     
@@ -53,5 +59,70 @@ public class DetteView extends ImpView<Dette> implements IDetteView {
             }
         } while (!isDecimal(montant));
         return Double.parseDouble(montant);
+    }
+
+    @Override
+    public void display(List<Dette> dettes) {
+        motif("+");
+        System.out.println("Liste des dettes: ");
+        motif("+");
+        for (Dette dette : dettes) {
+            displayDette(dette);
+        }
+    }
+
+    @Override
+    public void displayDette(Dette dette) {
+        System.out.println("ID: " + dette.getIdDette());
+        System.out.println("Montant Total: " + dette.getMontantTotal());
+        System.out.println("Montant Verser: " + dette.getMontantVerser());
+        System.out.println("Montant Restant: " + dette.getMontantRestant());
+        System.out.println("Status: " + dette.isStatus());
+        System.out.println("Etat: " + dette.getEtat());
+        System.out.println("Date de contraction: " + dette.getDateCreation());
+        System.out.println("Client: " + dette.getClient().getSurname());
+        System.out.println("Demande de dette: " + (dette.getDemandeDette() == null ? "N/A" : dette.getDemandeDette()));
+        motif("-");
+        if (dette.getPaiements() != null) {
+            displayPay(dette);
+        } else {
+            System.out.println("Pas de paiements pour cette dette.");
+        }
+        motif("-");
+        if (dette.getDetails() != null) {
+            displayDetail(dette);
+        } else {
+            System.out.println("Pas d'articles pour cette dette.");
+        }
+        motif("+");
+    }
+    
+    @Override
+    public void displayPay(Dette dette) {
+        if (dette.getPaiements() != null && dette.getPaiements().isEmpty()) {
+            System.out.println("Pas de paiements pour cette dette.");
+            return;
+        }
+        System.out.println("---Paiements---");
+        for (Paiement paiement : dette.getPaiements()) {
+            System.out.println("  - Montant : " + paiement.getMontantPaye());
+            System.out.println("  - Date : " + paiement.getDatePaiement());
+            motif("-");
+        }
+    }
+
+    @Override
+    public void displayDetail(Dette dette) {
+        if (dette.getDetails() != null && dette.getDetails().isEmpty()) {
+            System.out.println("Pas de détails pour cette dette.");
+            return;
+        }
+        System.out.println("---Articles---");
+        for (Detail detail : dette.getDetails()) {
+            System.out.println("  - Article : " + detail.getArticle().getLibelle());
+            System.out.println("  - Quantité : " + detail.getQte());
+            System.out.println("  - Prix de vente : " + detail.getPrixVente());
+            motif("-");
+        }
     }
 }

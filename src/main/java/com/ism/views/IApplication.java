@@ -8,7 +8,8 @@ public interface IApplication {
     void msgSuccess();
     void msgSuccess(String msg);
     boolean isEmpty(int size, String msg);
-    void splice();
+    void motif(char letter);
+    void motif(String letter, int nbr);
     boolean isDigit(String number);
     boolean isDecimal(String number);
     boolean isInteger(String number);

@@ -36,7 +36,10 @@ public class ClientService implements IClientService {
     @Override
     public Client findBy(Client client) {
         for (Client cl : findAll()) {
-            if(cl.getUser().getIdUser() == client.getUser().getIdUser()) {
+            if(cl.getUser() != null && cl.getUser().getIdUser() == client.getUser().getIdUser()) {
+                return cl;
+            }
+            if (cl.getTel() != null && cl.getTel().compareTo(client.getTel()) == 0) {
                 return cl;
             }
         }
@@ -46,10 +49,19 @@ public class ClientService implements IClientService {
     @Override
     public Client findBy(List<Client> clients, Client client) {
         for (Client cl : clients) {
-            if(cl.getUser().getIdUser() == client.getUser().getIdUser()) {
+            if (cl.getIdClient() == client.getIdClient()) {
                 return cl;
             }
-            if (cl.getTel() != null && cl.getTel().compareTo(client.getTel()) == 0) {
+            if(client.getUser() != null && cl.getUser().getIdUser() == client.getUser().getIdUser()) {
+                return cl;
+            }
+            if (client.getTel() != null && cl.getTel().compareTo(client.getTel()) == 0) {
+                return cl;
+            }
+            if (client.getSurname() != null && cl.getSurname().compareTo(client.getSurname()) == 0) {
+                return cl;
+            }
+            if (client.getTel() != null && cl.getTel().compareTo(client.getTel()) == 0) {
                 return cl;
             }
         }
@@ -69,5 +81,15 @@ public class ClientService implements IClientService {
     @Override
     public boolean findByTel(String client) {
         return clientRepository.selectOne(client);
+    }
+
+    @Override
+    public void update(List<Client> clients, Client updateClient) {
+        for (int i = 0; i < clients.size(); i++) {
+            if (clients.get(i).getIdClient() == updateClient.getIdClient()) {
+                clients.set(i, updateClient);
+                break; // Sortir de la boucle une fois que la mise à jour est effectuée
+            }
+        }
     }
 }

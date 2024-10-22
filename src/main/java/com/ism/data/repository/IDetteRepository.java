@@ -8,4 +8,5 @@ import com.ism.data.entities.Dette;
 public interface IDetteRepository extends IRepository<Dette> {
     void changeStatus(Dette dette, boolean state);
     List<Dette> selectAllSoldes();
+    List<Dette> selectAllNonSoldes();
 }

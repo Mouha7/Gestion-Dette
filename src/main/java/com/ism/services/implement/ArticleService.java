@@ -51,4 +51,8 @@ public class ArticleService implements IArticleService {
         return null;
     }
     
+
+    public void update(Article article, int newQte) {
+        articleRepository.updateQte(article, newQte);
+    }
 }

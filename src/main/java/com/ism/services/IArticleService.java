@@ -11,4 +11,5 @@ public interface IArticleService {
     List<Article> findAllAvailable();
     Article findBy(Article article, List<Article> articles);
     int length();
+    void update(Article article, int newQte);
 }

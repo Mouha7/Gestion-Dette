@@ -14,4 +14,5 @@ public interface IClientService {
     List<Client> getAllActifs();
     boolean findByTel(String client);
     List<Client> findAllCustomerAvailable();
+    void update(List<Client> clients, Client updateClient);
 }

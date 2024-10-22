@@ -21,5 +21,7 @@ public class Detail {
 
     public Detail() {
         this.idDetteArticle = ++nbr;
+        this.qte = 0;
+        this.prixVente = 0.0;
     }
 }

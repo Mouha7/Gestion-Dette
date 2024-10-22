@@ -25,36 +25,58 @@ public class ArticleView extends ImpView<Article> implements IArticleView {
 
     @Override
     public Integer checked(String msg, String msgError) {
-        Integer value;
+        String value;
+        String error = "Erreur, ";
+        boolean valid = false; // Pour contrôler la boucle
+        Integer intValue = null;
+    
         do {
             System.out.print(msg);
-            value = scanner.nextInt();
-            if (value == 0) {
-                System.out.println("Erreur, la valeur ne peux pas être 0.");
-            } else if (value < 0) {
-                System.out.println("Erreur, " + msgError + " ne peut être négatif.");
+            value = scanner.nextLine();
+    
+            try {
+                intValue = Integer.parseInt(value); // Essaie de convertir la valeur en entier
+                if (intValue == 0) {
+                    System.out.println("Erreur, la valeur ne peut pas être 0.");
+                } else if (intValue < 0) {
+                    System.out.println(error + msgError + " ne peut être négatif.");
+                } else if (!isDecimal(value) && msgError.contains("prix")) {
+                    System.out.println(error + msgError + " doit être un nombre décimal.");
+                } else if (!isInteger(value) && msgError.contains("quantité")) {
+                    System.out.println(error + msgError + " doit être un nombre entier.");
+                } else {
+                    valid = true; // Tout est correct, sortir de la boucle
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Erreur, veuillez entrer un nombre valide.");
             }
-        } while (value <= 0);
-        return value;
+    
+        } while (!valid);
+    
+        return intValue;
     }
 
     @Override
     public Article getObject(List<Article> articles) {
         Article article;
-        int choix;
+        String choix;
         int count = articles.size();
         this.afficher(articles);
         do {
             article = new Article();
             System.out.print("Choisissez un article par son id: ");
-            choix = scanner.nextInt();
-            article.setIdArticle(choix);
-            article = articleService.findBy(article, articles);
+            choix = scanner.nextLine();
+            if (isInteger(choix)) {
+                article.setIdArticle(Integer.parseInt(choix));
+                article = articleService.findBy(article, articles);
+            } else {
+                continue;
+            }
             System.out.println(article);
-            if (article == null || choix > count) {
+            if (article == null || Integer.parseInt(choix) > count) {
                 System.out.println("Erreur, l'id de l'article est invalide.");
             }
-        } while (article == null || choix > count);
+        } while (article == null);
         return article;
     }
 }

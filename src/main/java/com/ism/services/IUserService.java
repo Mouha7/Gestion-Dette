@@ -10,7 +10,8 @@ public interface IUserService {
     User findBy(User user);
     User findBy(List<User> users, User user);
     void setStatus(User user, boolean state);
-    List<User> getAllActifs(int type);
+    List<User> getAllActifs(int type, User userConnect);
     User getByLogin(String login, String password);
     int length();
+    void update(List<User> users, User updateUser);
 }

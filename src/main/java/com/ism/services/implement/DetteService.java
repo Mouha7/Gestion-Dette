@@ -34,6 +34,16 @@ public class DetteService implements IDetteService {
     }
 
     @Override
+    public Dette findBy(List<Dette> dettes, Dette dette) {
+        for (Dette d : dettes) {
+            if (d.getIdDette() == dette.getIdDette()) {
+                return d;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public void setStatus(Dette dette, boolean state) {
         detteRepository.changeStatus(dette, state);
     }
@@ -43,13 +53,18 @@ public class DetteService implements IDetteService {
         return detteRepository.selectAllSoldes();
     }
 
-    public void update(List<Dette> dettes, Dette dette) {
-        dettes.stream()
-                .map(d -> {
-                    if (d.getIdDette() == dette.getIdDette()) {
-                        return dette;
-                    }
-                    return d;
-                });
+    @Override
+    public List<Dette> getAllNonSoldes() {
+        return detteRepository.selectAllNonSoldes();
+    }
+
+    @Override
+    public void update(List<Dette> dettes, Dette updatedDette) {
+        for (int i = 0; i < dettes.size(); i++) {
+            if (dettes.get(i).getIdDette() == updatedDette.getIdDette()) {
+                dettes.set(i, updatedDette);
+                break; // Sortir de la boucle une fois que la mise à jour est effectuée
+            }
+        }
     }
 }

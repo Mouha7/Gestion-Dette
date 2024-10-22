@@ -11,6 +11,8 @@ import com.ism.data.entities.Dette;
 import com.ism.data.entities.User;
 import com.ism.data.enums.EtatDemandeDette;
 import com.ism.services.IArticleService;
+import com.ism.services.IClientService;
+import com.ism.services.IDemandeArticleService;
 import com.ism.services.IDemandeDetteService;
 import com.ism.services.IDetteService;
 import com.ism.views.IDemandeDetteView;
@@ -20,18 +22,22 @@ import com.ism.views.implement.Application;
 
 public class ApplicationClient extends Application implements IApplicationClient {
     private final IArticleService articleService;
+    private final IClientService clientService;
     private final IDemandeDetteService demandeDetteService;
     private final IDemandeDetteView demandeDetteView;
+    private final IDemandeArticleService demandeArticleService;
     private final IDetteService detteService;
     private final IDetteView detteView;
     private final Scanner scanner;
 
-    public ApplicationClient(IArticleService articleService, IDemandeDetteService demandeDetteService, IDemandeDetteView demandeDetteView, IDetteService detteService, IDetteView detteView, Scanner scanner) {
+    public ApplicationClient(IArticleService articleService, IClientService clientService, IDemandeDetteService demandeDetteService, IDemandeDetteView demandeDetteView, IDemandeArticleService demandeArticleService, IDetteService detteService, IDetteView detteView, Scanner scanner) {
         this.articleService = articleService;
         this.demandeDetteService = demandeDetteService;
         this.demandeDetteView = demandeDetteView;
+        this.demandeArticleService = demandeArticleService;
         this.detteService = detteService;
         this.detteView = detteView;
+        this.clientService = clientService;
         this.scanner = scanner;
     }
 
@@ -64,7 +70,7 @@ public class ApplicationClient extends Application implements IApplicationClient
                     displayDette(detteService, detteView);
                     break;
                 case 2:
-                    saisirDette(articleService, demandeDetteService, demandeDetteView, user);
+                    saisirDette(articleService, clientService, demandeDetteService, demandeDetteView, demandeArticleService, user);
                     break;
                 case 3:
                     displayDemandeDette(demandeDetteService, demandeDetteView);
@@ -85,10 +91,10 @@ public class ApplicationClient extends Application implements IApplicationClient
             return;
         }
         System.out.println("Choisissez l'id pour plus de detail");
-        splice();
+        motif('+');
         detteView.afficher(detteService.findAll());
         Dette dette = detteView.getObject(detteService.findAll());
-        splice();
+        motif('+');
         subMenu(dette);
     }
 
@@ -123,8 +129,8 @@ public class ApplicationClient extends Application implements IApplicationClient
     }
 
     @Override
-    public void saisirDette(IArticleService articleService, IDemandeDetteService demandeDetteService, IDemandeDetteView demandeDetteView, User user) {
-        DemandeDette dette = demandeDetteView.saisir(articleService, user);
+    public void saisirDette(IArticleService articleService, IClientService clientService,IDemandeDetteService demandeDetteService, IDemandeDetteView demandeDetteView, IDemandeArticleService demandeArticleService, User user) {
+        DemandeDette dette = demandeDetteView.saisir(clientService, articleService, demandeArticleService, user);
         if (dette == null) {
             return;
         }
@@ -143,7 +149,7 @@ public class ApplicationClient extends Application implements IApplicationClient
         if (choix == 'O' || choix == 'o') {
             subMenuDemandeDette(demandeDetteService, demandeDetteView);
         }
-        splice();
+        motif('+');
     }
 
     @Override
@@ -173,7 +179,7 @@ public class ApplicationClient extends Application implements IApplicationClient
         }
         DemandeDette demandeDette = demandeDetteView.getObject(demandeDettes, demandeDetteService);
         demandeDette.setEtat(EtatDemandeDette.ENCOURS);
-        demandeDetteService.update(demandeDette);
+        demandeDetteService.update(demandeDettes, demandeDette);
         msgSuccess("Relancement de la demande de dette avec succès.");
     }
 }

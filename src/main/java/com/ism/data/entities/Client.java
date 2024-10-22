@@ -1,5 +1,6 @@
 package com.ism.data.entities;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.EqualsAndHashCode;
@@ -26,14 +27,31 @@ public class Client {
     private List<Dette> dettes;
 
     public Client() {
+        this.cumulMontantDu = 0.0;
         this.idClient = ++nbr;
     }
 
     public void addDemandeDette(DemandeDette demandeDette) {
+        if (demandeDettes == null) {
+            demandeDettes = new ArrayList<>();
+        }
         demandeDettes.add(demandeDette);
     }
 
     public void addDetteClient(Dette dette) {
+        if (dettes == null) {
+            dettes = new ArrayList<>();
+        }
         dettes.add(dette);
+    }
+
+    public Double getCumulMontantDu() {
+        if (dettes != null && !dettes.isEmpty()) {
+            for (Dette d : dettes) {
+                cumulMontantDu += d.getMontantRestant();
+            }
+            return cumulMontantDu;
+        }
+        return cumulMontantDu;
     }
 }

@@ -1,5 +1,6 @@
 package com.ism.views.admin;
 
+import com.ism.data.entities.User;
 import com.ism.services.IArticleService;
 import com.ism.services.IClientService;
 import com.ism.services.IDetteService;
@@ -18,7 +19,7 @@ public interface IApplicationAdmin extends IApplication {
     void updateQte(IArticleService articleService, IArticleView articleView);
     void listingArticleAvailable(IArticleService articleService, IArticleView articleView);
     void createArticle(IArticleService articleService, IArticleView articleView);
-    void listingUserActifs(IUserService userService, IUserView userView);
-    void activeDesactiveAccount(IUserService userService, IUserView userView);
+    void listingUserActifs(IUserService userService, IUserView userView, User userConnect);
+    void activeDesactiveAccount(IUserService userService, IUserView userView, User userConnect);
     void createAccountCustomer(IClientService clientService, IClientView clientView, IUserService userService, IUserView userView);
 }

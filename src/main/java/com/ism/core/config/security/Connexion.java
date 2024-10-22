@@ -13,14 +13,17 @@ public class Connexion implements IConnexion {
     public Connexion(IUserService userService, Scanner scanner) {
         this.userService = userService;
         this.scanner = scanner;
+        User user = new User("admin@admin.sn", "a", "a", true, Role.ADMIN);
+        userService.add(user);
+        User client = new User("client@admin.sn", "c", "c", true, Role.CLIENT);
+        userService.add(client);
+        User boutiquier = new User("boutiquier@admin.sn", "b", "b", true, Role.BOUTIQUIER);
+        userService.add(boutiquier);
     }
     
     @Override
     public User connexion() {
-        User user = new User("admin@admin.sn", "a", "a", true, Role.ADMIN);
-        userService.add(user);
-        User client = new User("admin@admin.sn", "c", "c", true, Role.CLIENT);
-        userService.add(client);
+        User user;
         do {
             System.out.println("Bienvenu sur l'application de gestion de dette");
             System.out.println("Veuillez-vous connecter");

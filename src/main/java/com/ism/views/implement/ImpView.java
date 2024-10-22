@@ -34,4 +34,14 @@ public abstract class ImpView<T> implements IView<T> {
             return false;
         }
     }
+
+    @Override
+    public void motif(String letter) {
+        motif(letter, 64);
+    }
+
+    @Override
+    public void motif(String letter, int nbr) {
+        System.out.println(String.valueOf(letter).repeat(nbr));
+    }
 }

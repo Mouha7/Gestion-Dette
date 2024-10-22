@@ -23,11 +23,14 @@ public class DemandeDette {
     private static int nbr;
 
     // Nav
-    private List<DemandeArticle> demandeArticles = new ArrayList<>();
+    private List<DemandeArticle> demandeArticles;
     private Dette dette;
     private Client client;
 
     public void addDemandeArticle(DemandeArticle demandeArticle) {
+        if (demandeArticles == null) {
+            demandeArticles = new ArrayList<>();
+        }
         demandeArticles.add(demandeArticle);
     }
 

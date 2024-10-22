@@ -1,7 +1,6 @@
 package com.ism.views.implement;
 
 import java.util.List;
-import java.time.LocalDate;
 
 import com.ism.data.entities.Article;
 import com.ism.data.entities.Client;
@@ -16,56 +15,58 @@ import com.ism.services.IDemandeDetteService;
 import com.ism.views.IDemandeDetteView;
 
 public class DemandeDetteView extends ImpView<DemandeDette> implements IDemandeDetteView {
-    private IClientService clientService;
-    private IDemandeArticleService demandeArticleService;
     private IDemandeDetteService demandeDetteService;
-    private IArticleService articleService;
 
-    public DemandeDetteView(IDemandeDetteService demandeDetteService, IArticleService articleService,
-            IDemandeArticleService demandeArticleService, IClientService clientService) {
-        this.articleService = articleService;
-        this.clientService = clientService;
-        this.demandeArticleService = demandeArticleService;
+    public DemandeDetteView(IDemandeDetteService demandeDetteService) {
         this.demandeDetteService = demandeDetteService;
     }
 
     @Override
-    public DemandeDette saisir(IArticleService articleService, User user) {
+    public DemandeDette saisir(IClientService clientService, IArticleService articleService, IDemandeArticleService demandeArticleService, User user) {
         List<Article> articleAvailable = articleService.findAllAvailable();
         if (articleAvailable.isEmpty()) {
             System.out.println("Aucun article n'a été enregistré.");
             return null;
         }
-        DemandeDette demandeDette = initializeDemandeDette(user);
+        DemandeDette demandeDette = initializeDemandeDette(clientService, user);
         String choice;
         do {
             displayAvailableArticles(articleAvailable);
             choice = getUserChoice();
             if (!choice.equals("0")) {
-                processArticleChoice(choice, articleAvailable, demandeDette);
+                processArticleChoice(choice, articleAvailable, articleService, demandeDette, demandeArticleService);
             }
         } while (!choice.equals("0"));
+
+        // Add demande de dette à un client
+        Client client = clientService.findBy(clientService.findAll(), demandeDette.getClient());
+        client.addDemandeDette(demandeDette);
+        // Transaction
+        clientService.update(clientService.findAll(), client);
         return demandeDette;
     }
 
     @Override
     public void afficher(List<DemandeDette> list) {
         for (DemandeDette demandeDette : list) {
-            System.out.println("ID: " + demandeDette.getIdDemandeDette());
-            System.out.println("Date: " + demandeDette.getDateDemande());
-            System.out.println("Montant total: " + demandeDette.getMontantTotal() + " Franc CFA");
-            System.out.println("État: " + demandeDette.getEtat());
-            System.out.println("Client: "
-                    + (demandeDette.getClient() != null ? demandeDette.getClient().getUser().getLogin() : "N/A"));
-            System.out.println("---Articles demandés---");
-            for (DemandeArticle da : demandeDette.getDemandeArticles()) {
-                System.out.println(
-                        "  - Libelle: " + da.getArticle().getLibelle() + " (Quantité: " + da.getQteArticle() + ")");
-            }
+            afficherDemandeDette(demandeDette);
         }
     }
 
-    private DemandeDette initializeDemandeDette(User user) {
+    @Override
+    public void afficherDemandeDette(DemandeDette demandeDette) {
+        System.out.println("ID: " + demandeDette.getIdDemandeDette());
+        System.out.println("Date: " + demandeDette.getDateDemande());
+        System.out.println("Montant total: " + demandeDette.getMontantTotal() + " Franc CFA");
+        System.out.println("État: " + demandeDette.getEtat());
+        System.out.println("Client: " + (demandeDette.getClient() != null ? demandeDette.getClient().getUser().getLogin() : "N/A"));
+        System.out.println("---Articles demandés---");
+        for (DemandeArticle da : demandeDette.getDemandeArticles()) {
+            System.out.println("  - Libelle: " + da.getArticle().getLibelle() + " (Quantité: " + da.getQteArticle() + ")");
+        }
+    }
+
+    private DemandeDette initializeDemandeDette(IClientService clientService, User user) {
         DemandeDette demandeDette = new DemandeDette();
         Client client = new Client();
         client.setUser(user);
@@ -75,8 +76,8 @@ public class DemandeDetteView extends ImpView<DemandeDette> implements IDemandeD
         } else {
             demandeDette.setClient(clientService.findBy(client));
         }
-        demandeDette.setEtat(EtatDemandeDette.ANNULE); // Pour les testes du 4
-        demandeDette.setDateDemande(LocalDate.now());
+        clientService.update(clientService.findAll(), client);
+        demandeDette.setEtat(EtatDemandeDette.ENCOURS);
         return demandeDette;
     }
 
@@ -89,12 +90,12 @@ public class DemandeDetteView extends ImpView<DemandeDette> implements IDemandeD
         return scanner.nextLine();
     }
 
-    private void processArticleChoice(String choice, List<Article> articleAvailable, DemandeDette demandeDette) {
+    private void processArticleChoice(String choice, List<Article> articleAvailable, IArticleService articleService, DemandeDette demandeDette, IDemandeArticleService demandeArticleService) {
         int quantity = getValidQuantity();
         if (quantity <= -1)
             return;
 
-        Article article = findArticle(choice, articleAvailable);
+        Article article = findArticle(choice, articleAvailable, articleService);
         if (article == null)
             return;
 
@@ -102,7 +103,7 @@ public class DemandeDetteView extends ImpView<DemandeDette> implements IDemandeD
             return;
 
         updateArticleStock(article, quantity);
-        addDemandeArticle(article, quantity, demandeDette);
+        addDemandeArticle(article, quantity, demandeDette, demandeArticleService);
     }
 
     private int getValidQuantity() {
@@ -117,7 +118,7 @@ public class DemandeDetteView extends ImpView<DemandeDette> implements IDemandeD
         return Integer.parseInt(qte);
     }
 
-    private Article findArticle(String id, List<Article> articleAvailable) {
+    private Article findArticle(String id, List<Article> articleAvailable, IArticleService articleService) {
         Article article = new Article();
         if (id.matches("\\d")) {
             article.setIdArticle(Integer.parseInt(id));
@@ -143,17 +144,17 @@ public class DemandeDetteView extends ImpView<DemandeDette> implements IDemandeD
         article.setQteStock(article.getQteStock() - quantity);
     }
 
-    private void addDemandeArticle(Article article, int quantity, DemandeDette demandeDette) {
+    private void addDemandeArticle(Article article, int quantity, DemandeDette demandeDette, IDemandeArticleService demandeArticleService) {
+        // créer une demande d'article
         DemandeArticle demandeArticle = new DemandeArticle();
         demandeArticle.setQteArticle(quantity);
         demandeArticle.setArticle(article);
         demandeArticle.setDemandeDette(demandeDette);
 
         demandeDette.setMontantTotal((article.getPrix() * quantity));
-
         demandeArticle.setDemandeDette(demandeDette);
         demandeDette.addDemandeArticle(demandeArticle);
-
+        // Transaction
         demandeArticleService.add(demandeArticle);
     }
 
@@ -169,7 +170,7 @@ public class DemandeDetteView extends ImpView<DemandeDette> implements IDemandeD
             choix = scanner.nextLine();
             if (isInteger(choix)) {
                 demandeDette.setIdDemandeDette(Integer.parseInt(choix));
-                demandeDette = demandeDetteService.findBy(demandeDette);
+                demandeDette = demandeDetteService.findBy(list, demandeDette);
             } else {
                 continue;
             }

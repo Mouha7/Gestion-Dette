@@ -1,6 +1,8 @@
 package com.ism.views.admin.implement;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Scanner;
 
 import com.ism.data.entities.Article;
@@ -49,22 +51,17 @@ public class ApplicationAdmin extends Application implements IApplicationAdmin {
         do {
             choix = menu();
             switch (choix) {
-                case 0:
-                    clientService.add(clientView.saisir());
-                    msgSuccess(MSG_ACCOUNT);
-                    break;
                 case 1:
                     createAccountCustomer(clientService, clientView, userService, userView);
                     break;
                 case 2:
-                    userService.add(userView.saisir());
-                    msgSuccess(MSG_ACCOUNT);
+                    createAccountUser(userService, userView);
                     break;
                 case 3:
-                    activeDesactiveAccount(userService, userView);
+                    activeDesactiveAccount(userService, userView, user);
                     break;
                 case 4:
-                    listingUserActifs(userService, userView);
+                    listingUserActifs(userService, userView, user);
                     break;
                 case 5:
                     createArticle(articleService, articleView);
@@ -88,8 +85,8 @@ public class ApplicationAdmin extends Application implements IApplicationAdmin {
 
     @Override
     public int menu() {
-        String choice;
         String[] validValues = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+        String choice;
         do {
             System.out.println("1- Créer un compte à un client n'ayant pas de compte");
             System.out.println("2- Créer un compte utilisateur (Admin ou Boutiquier)");
@@ -123,6 +120,14 @@ public class ApplicationAdmin extends Application implements IApplicationAdmin {
         } while (!choix.equals("1") && !choix.equals("2"));
 
         return Integer.parseInt(choix);
+    }
+
+    public void createAccountUser(IUserService userService, IUserView userView) {
+        User user = userView.saisir(userService);
+        if (user != null) {
+            userService.add(user);
+            msgSuccess(MSG_ACCOUNT);
+        }
     }
 
     @Override
@@ -187,8 +192,7 @@ public class ApplicationAdmin extends Application implements IApplicationAdmin {
             return;
         }
         Article article = articleView.getObject(articleService.findAll());
-        Integer newQte = Integer
-                .valueOf(articleView.checked("Entrez la nouvelle quantité de l'article : ", "la quantité").toString());
+        Integer newQte = Integer.valueOf(articleView.checked("Entrez la nouvelle quantité de l'article : ", "la quantité").toString());
         articleService.setQte(article, newQte);
         msgSuccess("Modifiée avec succès !");
     }
@@ -208,35 +212,35 @@ public class ApplicationAdmin extends Application implements IApplicationAdmin {
     }
 
     @Override
-    public void listingUserActifs(IUserService userService, IUserView userView) {
+    public void listingUserActifs(IUserService userService, IUserView userView, User userConnect) {
         int choixRole = role();
         switch (choixRole) {
             case 1:
                 if (isEmpty(userService.length(), "Aucun admin n'a été enregistré.")) {
                     break;
                 }
-                if (isEmpty(userService.getAllActifs(0).size(), "Aucun admin n'est actif.")) {
+                if (isEmpty(userService.getAllActifs(0, userConnect).size(), "Aucun admin n'est actif.")) {
                     break;
                 }
-                userView.afficher(userService.getAllActifs(0));
+                userView.afficher(userService.getAllActifs(0, userConnect));
                 break;
             case 2:
                 if (isEmpty(userService.length(), "Aucun boutiquier n'a été enregistré.")) {
                     break;
                 }
-                if (isEmpty(userService.getAllActifs(1).size(), "Aucun boutiquier n'est actif.")) {
+                if (isEmpty(userService.getAllActifs(1, userConnect).size(), "Aucun boutiquier n'est actif.")) {
                     break;
                 }
-                userView.afficher(userService.getAllActifs(1));
+                userView.afficher(userService.getAllActifs(1, userConnect));
                 break;
             case 3:
                 if (isEmpty(userService.length(), MSG_CLIENT)) {
                     break;
                 }
-                if (isEmpty(userService.getAllActifs(2).size(), "Aucun client n'est actif.")) {
+                if (isEmpty(userService.getAllActifs(2, userConnect).size(), "Aucun client n'est actif.")) {
                     break;
                 }
-                userView.afficher(userService.getAllActifs(2));
+                userView.afficher(userService.getAllActifs(2, userConnect));
                 break;
             default:
                 break;
@@ -244,11 +248,15 @@ public class ApplicationAdmin extends Application implements IApplicationAdmin {
     }
 
     @Override
-    public void activeDesactiveAccount(IUserService userService, IUserView userView) {
-        if (isEmpty(userService.length(), "Aucun compte admin ou boutiquier ou client n'a été enregistré.")) {
+    public void activeDesactiveAccount(IUserService userService, IUserView userView, User userConnect) {
+        List<User> users = userService.findAll()
+                            .stream()
+                            .filter(us -> us.getIdUser() != userConnect.getIdUser())
+                            .collect(Collectors.toList());
+        if (isEmpty(users.size(), "Aucun compte admin ou boutiquier ou client n'a été enregistré.")) {
             return;
         }
-        User user = userView.getObject(userService.findAll());
+        User user = userView.getObject(users);
         boolean state = !user.isStatus();
         userService.setStatus(user, state);
         msgStatus(state);
@@ -257,12 +265,18 @@ public class ApplicationAdmin extends Application implements IApplicationAdmin {
     @Override
     public void createAccountCustomer(IClientService clientService, IClientView clientView, IUserService userService,
             IUserView userView) {
-        if (isEmpty(clientService.findAllCustomerAvailable().size(), MSG_CLIENT)) {
+        List<Client> clients = clientService.findAllCustomerAvailable();
+        if (isEmpty(clients.size(), MSG_CLIENT)) {
             return;
         }
         Client client = clientView.getObject(clientService.findAllCustomerAvailable());
-        userService.add(userView.accountCustomer());
-        msgSuccess(MSG_ACCOUNT);
+        User user = userView.accountCustomer(userService, client);
+        if (user != null) {
+            client.setUser(user);
+            clientService.update(clients, client);
+            userService.add(user);
+            msgSuccess(MSG_ACCOUNT);
+        }
     }
 
 }

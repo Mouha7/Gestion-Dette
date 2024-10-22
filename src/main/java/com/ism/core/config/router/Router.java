@@ -8,7 +8,9 @@ import com.ism.core.factory.IFactory;
 import com.ism.data.entities.User;
 import com.ism.services.IArticleService;
 import com.ism.services.IClientService;
+import com.ism.services.IDemandeArticleService;
 import com.ism.services.IDemandeDetteService;
+import com.ism.services.IDetailService;
 import com.ism.services.IDetteService;
 import com.ism.services.IPaiementService;
 import com.ism.services.IUserService;
@@ -32,6 +34,8 @@ public class Router implements IRouter {
     private final IClientView clientView;
     private final IDemandeDetteService demandeDetteService;
     private final IDemandeDetteView demandeDetteView;
+    private final IDemandeArticleService demandeArticleService;
+    private final IDetailService detailService;
     private final IDetteService detteService;
     private final IDetteView detteView;
     private final IPaiementService paiementService;
@@ -52,6 +56,8 @@ public class Router implements IRouter {
         this.clientView = factory.getFactoryView().getInstanceClientView();
         this.demandeDetteService = factory.getFactoryService().getInstanceDemandeDetteService();
         this.demandeDetteView = factory.getFactoryView().getInstanceDemandeDetteView();
+        this.demandeArticleService = factory.getFactoryService().getInstanceDemandeArticleService();
+        this.detailService = factory.getFactoryService().getInstanceDetailService();
         this.detteService = factory.getFactoryService().getInstanceDetteService();
         this.detteView = factory.getFactoryView().getInstanceDetteView();
         this.paiementService = factory.getFactoryService().getInstancePaiementService();
@@ -61,8 +67,8 @@ public class Router implements IRouter {
         this.scanner = scanner;
 
         this.appAdmin = new ApplicationAdmin(this.articleService, this.articleView, this.clientService, this.clientView, this.detteService, this.detteView, this.userService, this.userView, this.scanner);
-        this.appClient = new ApplicationClient(this.articleService, this.demandeDetteService, this.demandeDetteView, this.detteService, this.detteView, this.scanner);
-        this.appStorekeeper = new ApplicationStorekeeper(this.articleService, this.articleView, this.clientService, this.clientView, this.userService, this.userView, this.detteService, this.detteView, this.paiementService, this.paiementView, this.scanner);
+        this.appClient = new ApplicationClient(this.articleService, clientService, this.demandeDetteService, this.demandeDetteView, this.demandeArticleService, this.detteService, this.detteView, this.scanner);
+        this.appStorekeeper = new ApplicationStorekeeper(this.articleService, this.clientService, this.clientView, this.demandeDetteService, this.demandeDetteView, this.detailService, this.detteService, this.detteView, this.paiementService, this.paiementView, userService, userView, this.scanner);
         this.conn = new Connexion(this.userService, this.scanner);
     }
 

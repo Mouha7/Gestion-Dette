@@ -33,6 +33,7 @@ public class DemandeDetteService implements IDemandeDetteService {
         return null;
     }
 
+    @Override
     public DemandeDette findBy(List<DemandeDette> demandeDettes,DemandeDette demandeDette) {
         for (DemandeDette dette : demandeDettes) {
             if (dette.getIdDemandeDette() == demandeDette.getIdDemandeDette()) {
@@ -48,7 +49,12 @@ public class DemandeDetteService implements IDemandeDetteService {
     }
 
     @Override
-    public void update(DemandeDette demandeDette) {
-        demandeDetteRepository.selectUpdate(demandeDette);
+    public void update(List<DemandeDette> demandeDettes, DemandeDette updateDemande) {
+        for (int i = 0; i < demandeDettes.size(); i++) {
+            if (demandeDettes.get(i).getIdDemandeDette() == updateDemande.getIdDemandeDette()) {
+                demandeDettes.set(i, updateDemande);
+                break; // Sortir de la boucle une fois que la mise à jour est effectuée
+            }
+        }
     }
 }

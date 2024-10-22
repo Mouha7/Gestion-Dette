@@ -35,12 +35,12 @@ public class FactoryView implements IFactoryView {
 
     @Override
     public IClientView getInstanceClientView() {
-        return clientView == null ? new ClientView(factoryService.getInstanceClientService(), getInstanceUserView()) : clientView;
+        return clientView == null ? new ClientView(factoryService.getInstanceClientService()) : clientView;
     }
 
     @Override
     public IDemandeDetteView getInstanceDemandeDetteView() {
-        return demandeDetteView == null ? new DemandeDetteView(factoryService.getInstanceDemandeDetteService(), factoryService.getInstanceArticleService(), factoryService.getInstanceDemandeArticleService(), factoryService.getInstanceClientService()) : demandeDetteView;
+        return demandeDetteView == null ? new DemandeDetteView(factoryService.getInstanceDemandeDetteService()) : demandeDetteView;
     }
 
     @Override

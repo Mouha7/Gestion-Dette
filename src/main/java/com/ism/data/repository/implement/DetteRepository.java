@@ -24,4 +24,11 @@ public class DetteRepository extends Repository<Dette> implements IDetteReposito
                 .filter(dette -> dette.getMontantRestant() == 0)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<Dette> selectAllNonSoldes() {
+        return selectAll().stream()
+                .filter(dette -> dette.getMontantRestant() != 0)
+                .collect(Collectors.toList());
+    }
 }
