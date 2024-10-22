@@ -48,6 +48,7 @@ public class ApplicationAdmin extends Application implements IApplicationAdmin {
     @Override
     public void run(User user) {
         Integer choix;
+        msgWelcome(user);
         do {
             choix = menu();
             switch (choix) {
@@ -67,7 +68,6 @@ public class ApplicationAdmin extends Application implements IApplicationAdmin {
                     createArticle(articleService, articleView);
                     break;
                 case 6:
-                    articleService.findAll();
                     listingArticleAvailable(articleService, articleView);
                     break;
                 case 7:

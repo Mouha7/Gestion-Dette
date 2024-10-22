@@ -1,5 +1,6 @@
 package com.ism.views.implement;
 
+import com.ism.data.entities.User;
 import com.ism.views.IApplication;
 
 public abstract class Application implements IApplication {
@@ -17,6 +18,11 @@ public abstract class Application implements IApplication {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void msgWelcome(User user) {
+        System.out.println("Bienvenue " + user.getLogin() + "!");
     }
 
     @Override

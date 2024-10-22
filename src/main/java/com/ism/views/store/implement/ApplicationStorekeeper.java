@@ -91,6 +91,7 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
     @Override
     public void run(User user) {
         Integer choix;
+        msgWelcome(user);
         do {
             choix = menu();
             switch (choix) {

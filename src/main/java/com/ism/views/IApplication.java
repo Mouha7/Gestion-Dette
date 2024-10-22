@@ -13,4 +13,5 @@ public interface IApplication {
     boolean isDigit(String number);
     boolean isDecimal(String number);
     boolean isInteger(String number);
+    void msgWelcome(User user);
 }

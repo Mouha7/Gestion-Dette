@@ -2,6 +2,7 @@ package com.ism.views.implement;
 
 import java.util.List;
 
+import com.ism.core.helper.PasswordUtils;
 import com.ism.data.entities.Client;
 import com.ism.data.entities.User;
 import com.ism.data.enums.Role;
@@ -35,7 +36,7 @@ public class UserView extends ImpView<User> implements IUserView {
             return null;
         }
         System.out.print(MSG_PASSWORD);
-        user.setPassword(scanner.nextLine());
+        user.setPassword(PasswordUtils.hashPassword(scanner.nextLine()));
         user.setStatus(true);
         user.setRole(Role.CLIENT);
         user.setClient(client);
@@ -59,7 +60,7 @@ public class UserView extends ImpView<User> implements IUserView {
             return null;
         }
         System.out.print(MSG_PASSWORD);
-        user.setPassword(scanner.nextLine());
+        user.setPassword(PasswordUtils.hashPassword(scanner.nextLine()));
         user.setRole(Role.values()[typeRole() - 1]);
         user.setStatus(true);
         return user;
