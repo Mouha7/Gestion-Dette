@@ -1,5 +1,6 @@
 package com.ism.views.implement;
 
+import com.ism.core.helper.Helper;
 import com.ism.data.entities.User;
 import com.ism.views.IApplication;
 
@@ -22,7 +23,7 @@ public abstract class Application implements IApplication {
 
     @Override
     public void msgWelcome(User user) {
-        System.out.println("Bienvenue " + user.getLogin() + "!");
+        System.out.println("Bienvenue " + Helper.capitalize(user.getLogin()) + "!");
     }
 
     @Override

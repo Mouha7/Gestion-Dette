@@ -24,19 +24,18 @@ public class PaiementView extends ImpView<Paiement> implements IPaiementView {
     public Paiement getObject(List<Paiement> list) {
         Paiement paiement;
         String choix;
-        int count = list.size();
         this.afficher(list);
         do {
             paiement = new Paiement();
             System.out.print("Choisissez une paiement par son id: ");
             choix = scanner.nextLine();
             if (isInteger(choix)) {
-                paiement.setIdPaiement(Integer.parseInt(choix));
+                paiement.setId(Long.parseLong(choix));
                 paiement = paiementService.findBy(paiementService.findAll(), paiement);
             } else {
                 continue;
             }
-            if (paiement == null || Integer.parseInt(choix) > count) {
+            if (paiement == null) {
                 System.out.println("Erreur, l'id est invalide.");
             }
 
@@ -50,13 +49,21 @@ public class PaiementView extends ImpView<Paiement> implements IPaiementView {
         do {
             System.out.print(msg);
             montant = scanner.nextLine();
+            if (montant.isBlank()) {
+                System.out.println("Erreur, le montant est vide.");
+                continue;
+            }
             if (!isDecimal(montant)) {
                 System.out.println("Format incorrect, le montant doit être un nombre.");
+                continue;
             }
             if (Double.parseDouble(montant) <= 0.0) {
-                System.out.println("Format incorrect, le montant doit positif.");
+                System.out.println("Format incorrect, le montant doit être positif.");
+                continue;
             }
-        } while (!isDecimal(montant) && Double.parseDouble(montant) <= 0.0);
+            // Si toutes les validations sont passées, sortir de la boucle
+            break;
+        } while (true);
         return Double.parseDouble(montant);
     }
 }

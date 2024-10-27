@@ -2,9 +2,7 @@ package com.ism.core.config.security;
 
 import java.util.Scanner;
 
-import com.ism.core.helper.PasswordUtils;
 import com.ism.data.entities.User;
-import com.ism.data.enums.Role;
 import com.ism.services.IUserService;
 
 public class Connexion implements IConnexion {
@@ -14,12 +12,6 @@ public class Connexion implements IConnexion {
     public Connexion(IUserService userService, Scanner scanner) {
         this.userService = userService;
         this.scanner = scanner;
-        User user = new User("admin@admin.sn", "a", PasswordUtils.hashPassword("a"), true, Role.ADMIN);
-        userService.add(user);
-        User client = new User("client@admin.sn", "c", PasswordUtils.hashPassword("c"), true, Role.CLIENT);
-        userService.add(client);
-        User boutiquier = new User("boutiquier@admin.sn", "b", PasswordUtils.hashPassword("b"), true, Role.BOUTIQUIER);
-        userService.add(boutiquier);
     }
     
     @Override

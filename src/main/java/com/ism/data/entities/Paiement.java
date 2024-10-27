@@ -1,27 +1,35 @@
 package com.ism.data.entities;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
-@EqualsAndHashCode
-public class Paiement {
-    private int idPaiement;
-    private LocalDate datePaiement;
+@EqualsAndHashCode(callSuper = false)
+public class Paiement extends AbstractEntity {
     private Double montantPaye;
-    private static int nbr;
 
     // Nav
     private Dette dette;
 
+    public Paiement(Long id, LocalDateTime createdAt, LocalDateTime updatedAt, Double montantPaye, Dette dette) {
+        super(id, createdAt, updatedAt);
+        this.montantPaye = montantPaye;
+        this.dette = dette;
+    }
+
     public Paiement() {
-        this.idPaiement = ++nbr;
-        this.datePaiement = LocalDate.now();
+        super.createdAt = LocalDateTime.now();
+        super.updatedAt = LocalDateTime.now();
+    }
+
+    @Override
+    public String toString() {
+        return "Paiement [idPaiement=" + super.getId() + ", datePaiement=" + super.getCreatedAt() + ", montantPaye="
+                + montantPaye
+                + ", dette=" + dette + ", updateAt=" + super.getUpdatedAt() + "]";
     }
 }

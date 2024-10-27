@@ -28,8 +28,7 @@ public class UserView extends ImpView<User> implements IUserView {
             System.out.println("Erreur, l'email est déjà utilisé.");
             return null;
         }
-        System.out.print(MSG_LOGIN);
-        user.setLogin(scanner.nextLine());
+        user.setLogin(checkLogin());
         // Vérification Login unique
         if (userService.findBy(userService.findAll(), user) != null) {
             System.out.println("Erreur, le login est déjà utilisé.");
@@ -52,8 +51,7 @@ public class UserView extends ImpView<User> implements IUserView {
             System.out.println("Erreur, l'email est déjà utilisé.");
             return null;
         }
-        System.out.print(MSG_LOGIN);
-        user.setLogin(scanner.nextLine());
+        user.setLogin(checkLogin());
         // Vérification Login unique
         if (userService.findBy(userService.findAll(), user) != null) {
             System.out.println("Erreur, le login est déjà utilisé.");
@@ -66,21 +64,40 @@ public class UserView extends ImpView<User> implements IUserView {
         return user;
     }
 
+    private String checkLogin() {
+        String login;
+        // Regex pour un login valide
+        String loginRegex = "^[a-zA-Z0-9_-]{5,}$";
+        do {
+            System.out.print(MSG_LOGIN);
+            login = scanner.nextLine();
+            if (login.isBlank()) {
+                System.out.println("Le login ne peut pas être vide.");
+            }
+            // Vérifie si le login correspond au format attendu
+            if (!login.matches(loginRegex)) {
+                System.out.println("Format incorrect. Veuillez entrer un login valide (minimum 5 caractères, sans espace, sans accent, sans caractères spéciaux).");
+            }
+        } while (login.isBlank() || !login.matches(loginRegex));
+        return login.trim();
+    }
+
     private String checkEmail() {
         String email;
         // Regex pour un email valide
         String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
-        
         do {
             System.out.print(MSG_EMAIL);
             email = scanner.nextLine();
+            if (email.isBlank()) {
+                System.out.println("L'email ne peut pas être vide.");
+            }
             // Vérifie si l'email correspond au format attendu
             if (!email.matches(emailRegex)) {
                 System.out.println("Format incorrect. Veuillez entrer un email valide (par exemple : exemple@domaine.com).");
             }
-        } while (!email.matches(emailRegex));
-        
-        return email;
+        } while (email.isBlank() || !email.matches(emailRegex));
+        return email.trim();
     }
     
 
@@ -103,20 +120,19 @@ public class UserView extends ImpView<User> implements IUserView {
     public User getObject(List<User> users) {
         User user;
         String choix;
-        int count = users.size();
         this.afficher(users);
         do {
             user = new User();
             System.out.print("Choisissez une user par son id: ");
             choix = scanner.nextLine();
             if (isInteger(choix)) {
-                user.setIdUser(Integer.parseInt(choix));
-                user = userService.findBy(user);
+                user.setId(Long.parseLong(choix));
+                user = userService.findBy(users, user);
             } else {
                 continue;
             }
-            if (user == null || Integer.parseInt(choix) > count) {
-                System.out.println("Erreur, l'id est invalide.");
+            if (user == null) {
+                System.out.println("Erreur, l'user n'existe pas.");
             }
         } while (user == null);
         return user;

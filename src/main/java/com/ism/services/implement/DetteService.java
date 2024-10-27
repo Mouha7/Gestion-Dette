@@ -1,6 +1,9 @@
 package com.ism.services.implement;
 
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
+import java.util.Collections;
 
 import com.ism.data.entities.Dette;
 import com.ism.data.repository.IDetteRepository;
@@ -15,12 +18,22 @@ public class DetteService implements IDetteService {
 
     @Override
     public boolean add(Dette value) {
-        return detteRepository.insert(value);
+        try {
+            return detteRepository.insert(value);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
     public List<Dette> findAll() {
-        return detteRepository.selectAll();
+        try {
+            return detteRepository.selectAll();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
     }
 
     @Override
@@ -30,22 +43,22 @@ public class DetteService implements IDetteService {
 
     @Override
     public Dette findBy(Dette dette) {
-        return detteRepository.selectBy(dette);
-    }
-
-    @Override
-    public Dette findBy(List<Dette> dettes, Dette dette) {
-        for (Dette d : dettes) {
-            if (d.getIdDette() == dette.getIdDette()) {
-                return d;
-            }
+        try {
+            return detteRepository.selectBy(dette.getId());
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return null;
     }
 
     @Override
-    public void setStatus(Dette dette, boolean state) {
-        detteRepository.changeStatus(dette, state);
+    public Dette findBy(List<Dette> dettes, Dette dette) {
+        for (Dette d : dettes) {
+            if (Objects.equals(d.getId(), dette.getId())) {
+                return d;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -59,12 +72,11 @@ public class DetteService implements IDetteService {
     }
 
     @Override
-    public void update(List<Dette> dettes, Dette updatedDette) {
-        for (int i = 0; i < dettes.size(); i++) {
-            if (dettes.get(i).getIdDette() == updatedDette.getIdDette()) {
-                dettes.set(i, updatedDette);
-                break; // Sortir de la boucle une fois que la mise à jour est effectuée
-            }
+    public void update(Dette updatedDette) {
+        try {
+            detteRepository.update(updatedDette);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }

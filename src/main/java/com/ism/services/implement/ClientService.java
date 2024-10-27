@@ -1,6 +1,10 @@
 package com.ism.services.implement;
 
+import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.Collections;
 
 import com.ism.data.entities.Client;
 import com.ism.data.repository.IClientRepository;
@@ -15,12 +19,22 @@ public class ClientService implements IClientService {
 
     @Override
     public boolean add(Client client) {
-        return clientRepository.insert(client);
+        try {
+            return clientRepository.insert(client);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
     public List<Client> findAll() {
-        return clientRepository.selectAll();
+        try {
+            return clientRepository.selectAll();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
     }
 
     @Override
@@ -36,10 +50,14 @@ public class ClientService implements IClientService {
     @Override
     public Client findBy(Client client) {
         for (Client cl : findAll()) {
-            if(cl.getUser() != null && cl.getUser().getIdUser() == client.getUser().getIdUser()) {
+            if (Objects.equals(cl.getId(), client.getId())) {
                 return cl;
             }
-            if (cl.getTel() != null && cl.getTel().compareTo(client.getTel()) == 0) {
+            if (client.getUser() != null && cl.getUser() != null
+                    && Objects.equals(cl.getUser().getId(), client.getUser().getId())) {
+                return cl;
+            }
+            if (client.getTel() != null && cl.getTel().compareTo(client.getTel()) == 0) {
                 return cl;
             }
         }
@@ -49,10 +67,11 @@ public class ClientService implements IClientService {
     @Override
     public Client findBy(List<Client> clients, Client client) {
         for (Client cl : clients) {
-            if (cl.getIdClient() == client.getIdClient()) {
+            if (Objects.equals(cl.getId(), client.getId())) {
                 return cl;
             }
-            if(client.getUser() != null && cl.getUser().getIdUser() == client.getUser().getIdUser()) {
+            if (client.getUser() != null && cl.getUser() != null
+                    && Objects.equals(cl.getUser().getId(), client.getUser().getId())) {
                 return cl;
             }
             if (client.getTel() != null && cl.getTel().compareTo(client.getTel()) == 0) {
@@ -69,27 +88,17 @@ public class ClientService implements IClientService {
     }
 
     @Override
-    public void setStatus(Client client, boolean state) {
-        clientRepository.changeStatus(client, state);
-    }
-
-    @Override
     public List<Client> getAllActifs() {
         return clientRepository.selectAllActifs();
     }
 
     @Override
-    public boolean findByTel(String client) {
-        return clientRepository.selectOne(client);
-    }
-
-    @Override
     public void update(List<Client> clients, Client updateClient) {
-        for (int i = 0; i < clients.size(); i++) {
-            if (clients.get(i).getIdClient() == updateClient.getIdClient()) {
-                clients.set(i, updateClient);
-                break; // Sortir de la boucle une fois que la mise à jour est effectuée
-            }
+        try {
+            updateClient.setUpdatedAt(LocalDateTime.now());
+            clientRepository.update(updateClient);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }

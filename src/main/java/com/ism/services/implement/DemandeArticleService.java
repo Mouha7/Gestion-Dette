@@ -1,6 +1,9 @@
 package com.ism.services.implement;
 
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
+import java.util.Collections;
 
 import com.ism.data.entities.DemandeArticle;
 import com.ism.data.repository.IDemandeArticleRepository;
@@ -15,18 +18,28 @@ public class DemandeArticleService implements IDemandeArticleService {
 
     @Override
     public boolean add(DemandeArticle value) {
-        return demandeArticleRepository.insert(value);
+        try {
+            return demandeArticleRepository.insert(value);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
     public List<DemandeArticle> findAll() {
-        return demandeArticleRepository.selectAll();
+        try {
+            return demandeArticleRepository.selectAll();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
     }
 
     @Override
     public DemandeArticle findBy(DemandeArticle demandeArticle) {
         for (DemandeArticle article : findAll()) {
-            if (article.getIdDemandeArticle() == demandeArticle.getIdDemandeArticle()) {
+            if (Objects.equals(article.getId(), demandeArticle.getId())) {
                 return article;
             }
         }

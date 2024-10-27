@@ -7,9 +7,8 @@ import com.ism.data.entities.Article;
 public interface IArticleService {
     boolean add(Article value);
     List<Article> findAll();
-    void setQte(Article article, int newQte);
+    void update(Article article);
     List<Article> findAllAvailable();
     Article findBy(Article article, List<Article> articles);
     int length();
-    void update(Article article, int newQte);
 }

@@ -30,19 +30,18 @@ public class DetteView extends ImpView<Dette> implements IDetteView {
     public Dette getObject(List<Dette> dettes) {
         Dette dette;
         String choix;
-        int count = dettes.size();
         this.display(dettes);
         do {
             dette = new Dette();
             System.out.print("Choisissez une dette par son id: ");
             choix = scanner.nextLine();
             if (isInteger(choix)) {
-                dette.setIdDette(Integer.parseInt(choix));
+                dette.setId(Long.parseLong(choix));
                 dette = detteService.findBy(dettes, dette);
             } else {
                 continue;
             }
-            if (dette == null || Integer.parseInt(choix) > count) {
+            if (dette == null) {
                 System.out.println("Erreur, l'id est invalide.");
             }
         } while (dette == null);
@@ -54,10 +53,21 @@ public class DetteView extends ImpView<Dette> implements IDetteView {
         do {
             System.out.print(msg);
             montant = scanner.nextLine();
+            if (montant.isBlank()) {
+                System.out.println("Erreur, le montant est vide.");
+                continue;
+            }
             if (!isDecimal(montant)) {
                 System.out.println("Format incorrect, le montant doit être un nombre.");
+                continue;
             }
-        } while (!isDecimal(montant));
+            if (Double.parseDouble(montant) <= 0.0) {
+                System.out.println("Format incorrect, le montant doit être positif.");
+                continue;
+            }
+            // Si toutes les validations sont passées, sortir de la boucle
+            break;
+        } while (true);
         return Double.parseDouble(montant);
     }
 
@@ -73,13 +83,13 @@ public class DetteView extends ImpView<Dette> implements IDetteView {
 
     @Override
     public void displayDette(Dette dette) {
-        System.out.println("ID: " + dette.getIdDette());
+        System.out.println("ID: " + dette.getId());
         System.out.println("Montant Total: " + dette.getMontantTotal());
         System.out.println("Montant Verser: " + dette.getMontantVerser());
         System.out.println("Montant Restant: " + dette.getMontantRestant());
         System.out.println("Status: " + dette.isStatus());
         System.out.println("Etat: " + dette.getEtat());
-        System.out.println("Date de contraction: " + dette.getDateCreation());
+        System.out.println("Date de contraction: " + dette.getCreatedAt());
         System.out.println("Client: " + dette.getClient().getSurname());
         System.out.println("Demande de dette: " + (dette.getDemandeDette() == null ? "N/A" : dette.getDemandeDette()));
         motif("-");
@@ -106,7 +116,7 @@ public class DetteView extends ImpView<Dette> implements IDetteView {
         System.out.println("---Paiements---");
         for (Paiement paiement : dette.getPaiements()) {
             System.out.println("  - Montant : " + paiement.getMontantPaye());
-            System.out.println("  - Date : " + paiement.getDatePaiement());
+            System.out.println("  - Date : " + paiement.getCreatedAt());
             motif("-");
         }
     }

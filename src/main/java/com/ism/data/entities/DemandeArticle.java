@@ -1,24 +1,38 @@
 package com.ism.data.entities;
 
+import java.time.LocalDateTime;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
-@EqualsAndHashCode
-public class DemandeArticle {
-    private int idDemandeArticle;
+@EqualsAndHashCode(callSuper = false)
+public class DemandeArticle extends AbstractEntity {
     private int qteArticle;
-    private static int nbr;
 
     // Nav
     private Article article;
     private DemandeDette demandeDette;
 
+    public DemandeArticle(Long id, LocalDateTime createdAt, LocalDateTime updatedAt, int qteArticle, Article article,
+            DemandeDette demandeDette) {
+        super(id, createdAt, updatedAt);
+        this.qteArticle = qteArticle;
+        this.article = article;
+        this.demandeDette = demandeDette;
+    }
+
     public DemandeArticle() {
-        this.idDemandeArticle = ++nbr;
+        super.createdAt = LocalDateTime.now();
+        super.updatedAt = LocalDateTime.now();
+    }
+
+    @Override
+    public String toString() {
+        return "DemandeArticle [idDemandeArticle=" + super.getId() + ", qteArticle=" + qteArticle + ", article="
+                + article + ", demandeDette=" + demandeDette + ", createAt=" + super.getCreatedAt() + ", updateAt="
+                + super.getUpdatedAt() + "]";
     }
 }

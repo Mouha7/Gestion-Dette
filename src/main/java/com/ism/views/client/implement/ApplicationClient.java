@@ -5,6 +5,7 @@ import java.util.Scanner;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.ism.data.entities.DemandeArticle;
 import com.ism.data.entities.DemandeDette;
 import com.ism.data.entities.Detail;
 import com.ism.data.entities.Dette;
@@ -91,9 +92,8 @@ public class ApplicationClient extends Application implements IApplicationClient
         if (isEmpty(detteService.length(), "Aucun dette n'a été enregistré.")) {
             return;
         }
-        System.out.println("Choisissez l'id pour plus de detail");
         motif('+');
-        detteView.afficher(detteService.findAll());
+        System.out.println("Choisissez l'id pour plus de detail");
         Dette dette = detteView.getObject(detteService.findAll());
         motif('+');
         subMenu(dette);
@@ -121,8 +121,10 @@ public class ApplicationClient extends Application implements IApplicationClient
             choice = scanner.nextLine();
             if (choice.equals("1")) {
                 displayArticle(dette);
+                return;
             } else if (choice.equals("2")) {
                 displayPaiement(dette);
+                return;
             } else {
                 System.out.println("Erreur, choix invalide.");
             }
@@ -136,7 +138,14 @@ public class ApplicationClient extends Application implements IApplicationClient
             return;
         }
         demandeDetteService.add(dette);
+        transactionDemandeArticles(demandeArticleService, dette);
         msgSuccess("Demande de dette ajoutée avec succès.");
+    }
+
+    private void transactionDemandeArticles(IDemandeArticleService demandeArticleService, DemandeDette demandeDette) {
+        for (DemandeArticle a : demandeDette.getDemandeArticles()) {
+            demandeArticleService.add(a);
+        }
     }
 
     @Override
@@ -178,7 +187,7 @@ public class ApplicationClient extends Application implements IApplicationClient
         if (isEmpty(demandeDettes.size(), "Aucune demande de dette annulée n'a été trouvée.")) {
             return;
         }
-        DemandeDette demandeDette = demandeDetteView.getObject(demandeDettes, demandeDetteService);
+        DemandeDette demandeDette = demandeDetteView.getObject(demandeDettes);
         demandeDette.setEtat(EtatDemandeDette.ENCOURS);
         demandeDetteService.update(demandeDettes, demandeDette);
         msgSuccess("Relancement de la demande de dette avec succès.");

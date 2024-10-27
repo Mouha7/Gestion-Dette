@@ -2,6 +2,7 @@ package com.ism.views.implement;
 
 import java.util.List;
 
+import com.ism.core.helper.Helper;
 import com.ism.data.entities.Article;
 import com.ism.services.IArticleService;
 import com.ism.views.IArticleView;
@@ -16,11 +17,22 @@ public class ArticleView extends ImpView<Article> implements IArticleView {
     @Override
     public Article saisir() {
         Article article = new Article();
-        System.out.print("Entrez le libelle de l'article : ");
-        article.setLibelle(scanner.nextLine());
+        article.setLibelle(checkLibelle());
         article.setPrix(Double.valueOf(checked("Entrez le prix de l'article : ", "le prix").toString()));
         article.setQteStock(Integer.valueOf(checked("Entrez la quantité de l'article : ", "la quantité").toString()));
         return article;
+    }
+
+    private String checkLibelle() {
+        String libelle;
+        do {
+            System.out.print("Entrez le libelle de l'article (minimum 3 caractères, maximum 50 caractères) : ");
+            libelle = scanner.nextLine();
+            if (libelle.length() < 3 || libelle.length() > 50) {
+                System.out.println("Erreur, le libelle doit comporter entre 3 et 50 caractères.");
+            }
+        } while (libelle.length() < 3 || libelle.length() > 50);
+        return Helper.capitalize(libelle);
     }
 
     @Override
@@ -60,20 +72,19 @@ public class ArticleView extends ImpView<Article> implements IArticleView {
     public Article getObject(List<Article> articles) {
         Article article;
         String choix;
-        int count = articles.size();
         this.afficher(articles);
         do {
             article = new Article();
             System.out.print("Choisissez un article par son id: ");
             choix = scanner.nextLine();
             if (isInteger(choix)) {
-                article.setIdArticle(Integer.parseInt(choix));
+                article.setId(Long.parseLong(choix));
                 article = articleService.findBy(article, articles);
             } else {
                 continue;
             }
             System.out.println(article);
-            if (article == null || Integer.parseInt(choix) > count) {
+            if (article == null) {
                 System.out.println("Erreur, l'id de l'article est invalide.");
             }
         } while (article == null);

@@ -1,6 +1,6 @@
 package com.ism.data.entities;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,20 +9,15 @@ import com.ism.data.enums.EtatDette;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
-@EqualsAndHashCode
-public class Dette {
-    private int idDette;
+@EqualsAndHashCode(callSuper = false)
+public class Dette extends AbstractEntity {
     private Double montantTotal;
     private Double montantVerser;
     private boolean status;
     private EtatDette etat;
-    private LocalDate dateCreation;
-    private static int nbr;
 
     // Nav
     private Client client;
@@ -30,9 +25,20 @@ public class Dette {
     private List<Paiement> paiements;
     private List<Detail> details;
 
+    public Dette(Long id, LocalDateTime createdAt, LocalDateTime updatedAt, Double montantTotal, Double montantVerser,
+            boolean status, EtatDette etat, Client client, DemandeDette demandeDette) {
+        super(id, createdAt, updatedAt);
+        this.montantTotal = montantTotal;
+        this.montantVerser = montantVerser;
+        this.status = status;
+        this.etat = etat;
+        this.client = client;
+        this.demandeDette = demandeDette;
+    }
+
     public Dette() {
-        this.idDette = ++nbr;
-        this.dateCreation = LocalDate.now();
+        super.createdAt = LocalDateTime.now();
+        super.updatedAt = LocalDateTime.now();
         this.montantTotal = 0.0;
         this.montantVerser = 0.0;
     }
@@ -53,5 +59,13 @@ public class Dette {
 
     public Double getMontantRestant() {
         return this.montantTotal - this.montantVerser;
+    }
+
+    @Override
+    public String toString() {
+        return "Dette [idDette=" + super.getId() + ", montantTotal=" + montantTotal + ", montantVerser=" + montantVerser
+                + ", status=" + status + ", etat=" + etat + ", dateCreation=" + super.getCreatedAt() + ", client="
+                + client
+                + ", demandeDette=" + demandeDette + ", updateAt=" + super.getUpdatedAt() + "]";
     }
 }

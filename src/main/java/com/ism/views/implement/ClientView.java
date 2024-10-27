@@ -2,6 +2,7 @@ package com.ism.views.implement;
 
 import java.util.List;
 
+import com.ism.core.helper.Helper;
 import com.ism.data.entities.Client;
 import com.ism.data.entities.DemandeDette;
 import com.ism.data.entities.Dette;
@@ -19,7 +20,7 @@ public class ClientView extends ImpView<Client> implements IClientView {
     public Client saisir(IClientService clientService) {
         Client client = new Client();
         System.out.print("Entrez le surnom: ");
-        client.setSurname(scanner.nextLine());
+        client.setSurname(Helper.capitalize(scanner.nextLine()));
         // Vérification Surname unique
         if (clientService.findBy(clientService.findAll(), client) != null) {
             System.out.println("Erreur, le surname est déjà utilisé.");
@@ -32,7 +33,7 @@ public class ClientView extends ImpView<Client> implements IClientView {
             return null;
         }
         System.out.print("Entrez l'adresse: ");
-        client.setAddress(scanner.nextLine());
+        client.setAddress(Helper.capitalize(scanner.nextLine().trim()));
         client.setStatus(true);
         return client;
     }
@@ -42,12 +43,15 @@ public class ClientView extends ImpView<Client> implements IClientView {
         do {
             System.out.print("Entrez le numéro de téléphone : ");
             tel = scanner.nextLine();
+            if (tel.isBlank()) {
+                System.out.println("Erreur, le numéro de téléphone ne peut être vide.");
+            }
             // Vérifie si le numéro commence par 70, 77 ou 78, et contient 9 chiffres au total
             if (!tel.matches("(70|77|78)\\d{7}")) {
                 System.out.println("Format incorrect. Le numéro doit commencer par 70, 77 ou 78 et contenir 9 chiffres au total (par exemple : 77 xxx xx xx).");
             }
-        } while (!tel.matches("(70|77|78)\\d{7}"));
-        return "+221" + tel;
+        } while (tel.isBlank() || !tel.matches("(70|77|78)\\d{7}"));
+        return "+221" + tel.trim();
     }
     
 
@@ -55,19 +59,18 @@ public class ClientView extends ImpView<Client> implements IClientView {
     public Client getObject(List<Client> clients) {
         Client client;
         String choix;
-        int count = clients.size();
         this.display(clients);
         do {
             client = new Client();
             System.out.print("Choisissez un client par son id: ");
             choix = scanner.nextLine();
             if (isInteger(choix)) {
-                client.setIdClient(Integer.parseInt(choix));
+                client.setId(Long.parseLong(choix));
                 client = clientService.findBy(clients, client);
             } else {
                 continue;
             }
-            if (client == null || Integer.parseInt(choix) > count) {
+            if (client == null) {
                 System.out.println("Erreur, l'id est invalide.");
             }
         } while (client == null);
@@ -89,7 +92,7 @@ public class ClientView extends ImpView<Client> implements IClientView {
             return;
         }
         motif("+");
-        System.out.println("ID : " + client.getIdClient());
+        System.out.println("ID : " + client.getId());
         System.out.println("Surname : " + client.getSurname());
         System.out.println("Tel : " + client.getTel());
         System.out.println("Adresse : " + client.getAddress());
@@ -101,7 +104,7 @@ public class ClientView extends ImpView<Client> implements IClientView {
             System.out.println("Liste Demande de dette : ");
             for (DemandeDette dette : client.getDemandeDettes()) {
                 System.out.println("Montant Total: " + dette.getMontantTotal());
-                System.out.println("Date: " + dette.getDateDemande());
+                System.out.println("Date: " + dette.getId());
                 System.out.println("Etat: " + dette.getEtat());
             }
         } else {
@@ -116,7 +119,7 @@ public class ClientView extends ImpView<Client> implements IClientView {
                 System.out.println("Montant Restant: " + dette.getMontantRestant());
                 System.out.println("Status: " + dette.isStatus());
                 System.out.println("État: " + dette.getEtat());
-                System.out.println("Date: " + dette.getDateCreation());
+                System.out.println("Date: " + dette.getCreatedAt());
             }
         } else {
             System.out.println("Liste des dettes : N/A");

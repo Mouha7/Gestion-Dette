@@ -126,14 +126,20 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
     public void saisirClient(IClientService clientService, IClientView clientView, IUserService userService,
             IUserView userView) {
         Client client = clientView.saisir(clientService);
-        clientService.add(client);
-        System.out.print("Voulez-vous enregistrer un compte utilisateur(O/N): ");
-        String choix = scanner.nextLine();
-        if (choix.equalsIgnoreCase("O")) {
-            User user = userView.accountCustomer(userService, client);
-            client.setUser(user);
-            userService.add(user);
+        if (client == null) {
+            return;
         }
+        System.out.print("Voulez-vous enregistrer un compte utilisateur(O/N): ");
+        char choix = scanner.nextLine().charAt(0);
+        if (choix == 'O' || choix == 'o') {
+            User user = userView.accountCustomer(userService, client);
+            if (user == null) {
+                return;
+            }
+            userService.add(user);
+            client.setUser(user);
+        }
+        clientService.add(client);
         msgSuccess(MSG_ACCOUNT);
     }
 
@@ -189,11 +195,26 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
         }
         Client clientSearch = new Client();
         clientView.display(clientService.findAll());
-        System.out.print("Entrer le tel du client à rechercher: ");
-        clientSearch.setTel(scanner.nextLine());
+        clientSearch.setTel(checkTel());
         Client client = clientService.findBy(clientService.findAll(), clientSearch);
         clientView.displayClient(client);
         motif('+');
+    }
+
+    private String checkTel() {
+        String tel;
+        do {
+            System.out.print("Entrer le tel du client à rechercher: ");
+            tel = scanner.nextLine();
+            if (tel.isBlank()) {
+                System.out.println("Erreur, le numéro de téléphone ne peut être vide.");
+            }
+            // Vérifie si le numéro commence par 70, 77 ou 78, et contient 9 chiffres au total
+            if (!tel.matches("(70|77|78)\\d{7}")) {
+                System.out.println("Format incorrect. Le numéro doit commencer par 70, 77 ou 78 et contenir 9 chiffres au total (par exemple : 77 xxx xx xx).");
+            }
+        } while (tel.isBlank() || !tel.matches("(70|77|78)\\d{7}"));
+        return "+221" + tel.trim();
     }
 
     public void saisirDette(IArticleService articleService, IClientService clientService,
@@ -218,7 +239,7 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
             displayAvailableArticles(articleAvailable);
             choice = getUserChoice();
             if (!choice.equals("0")) {
-                testDette = processArticleChoice(articleService, choice, articleAvailable, dette, detailService);
+                testDette = processArticleChoice(articleService, choice, articleAvailable, dette);
                 if (testDette != null) {
                     dette = testDette;
                 }
@@ -231,11 +252,23 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
             Paiement paiement = (Paiement) result[0];
             dette = (Dette) result[1];
             dette.addPaiement(paiement);
+            // Mise à jour du cumul après le paiement
+            client.updateCumulAfterPaiement(dette, paiement.getMontantPaye());
         }
         // Transaction
         client.addDetteClient(dette);
         detteService.add(dette);
+        transactionDetail(detailService, dette);
+        // Mise à jour du client dans la base de données
+        client.updateCumulMontantDu();
+        clientService.update(clientService.findAll(), client);
         msgSuccess("Dette effectué avec succès!");
+    }
+
+    private void transactionDetail(IDetailService detailService, Dette dette) {
+        for (Detail d : dette.getDetails()) {
+            detailService.add(d);
+        }
     }
 
     private Object[] getPaiementClient(IPaiementView paiementView, Dette dette) {
@@ -261,7 +294,7 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
     }
 
     private Dette processArticleChoice(IArticleService articleService, String choice, List<Article> articleAvailable,
-            Dette dette, IDetailService detailService) {
+            Dette dette) {
         int quantity = getValidQuantity();
         if (quantity <= -1)
             return null;
@@ -274,7 +307,7 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
             return null;
 
         updateArticleStock(articleService, article, quantity);
-        return addDemandeArticle(article, quantity, dette, detailService);
+        return addDemandeArticle(article, quantity, dette);
     }
 
     private int getValidQuantity() {
@@ -292,7 +325,7 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
     private Article findArticle(String id, List<Article> articleAvailable) {
         Article article = new Article();
         if (id.matches("\\d")) {
-            article.setIdArticle(Integer.parseInt(id));
+            article.setId(Long.parseLong(id));
         }
         Article foundArticle = articleService.findBy(article, articleAvailable);
 
@@ -312,15 +345,11 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
     }
 
     private void updateArticleStock(IArticleService articleService, Article article, int quantity) {
-        for (Article ar : articleService.findAllAvailable()) {
-            if (ar.getIdArticle() == article.getIdArticle()) {
-                ar.setQteStock(ar.getQteStock() - quantity);
-                return;
-            }
-        }
+        article.setQteStock(article.getQteStock() - quantity);
+        articleService.update(article);
     }
 
-    private Dette addDemandeArticle(Article article, int quantity, Dette dette, IDetailService detailService) {
+    private Dette addDemandeArticle(Article article, int quantity, Dette dette) {
         // Ajouter une dette
         dette.setMontantTotal(dette.getMontantTotal() + (quantity * article.getPrix()));
         dette.setStatus(true);
@@ -332,7 +361,6 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
         detail.setArticle(article);
         detail.setDette(dette);
         // Transaction
-        detailService.add(detail);
         dette.addDetail(detail);
         return dette;
     }
@@ -351,8 +379,13 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
         // Update + Add paiement
         dette = (Dette) result[1];
         dette.addPaiement(paiement);
-        detteService.update(dettes, dette);
+        // Mise à jour du cumul du client après le paiement
+        Client client = dette.getClient();
+        client.updateCumulAfterPaiement(dette, paiement.getMontantPaye());
+        // Update toutes les entités
+        detteService.update(dette);
         paiementService.add(paiement);
+        clientService.update(clientService.findAll(), client);
         msgSuccess("Paiement effectué avec succès!");
     }
 
@@ -363,6 +396,9 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
             System.out.println("Aucune dette non soldé n'a été enregistrée.");
             return;
         }
+        motif('-');
+        System.out.println("Filtrer une dette");
+        motif('-');
         Client client = clientView.getObject(clientService.findAll());
         subMenu(detteView, client);
     }
@@ -374,10 +410,16 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
         System.out.print(MSG_CHOICE);
         choice = scanner.nextLine();
         if (choice.equals("1")) {
+            if (isEmpty(client.getDettes().size(), "Aucune article n'a été enregistrée.")) {
+                return;
+            }
             for (Dette dette : client.getDettes()) {
                 detteView.displayDetail(dette);
             }
         } else if (choice.equals("2")) {
+            if (isEmpty(client.getDettes().size(), "Aucune paiement n'a été enregistrée.")) {
+                return;
+            }
             for (Dette dette : client.getDettes()) {
                 detteView.displayPay(dette);
             }
@@ -402,6 +444,7 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
             subMenuDemandeDette(demandeDetteService, demandeDetteView);
         } else if (choice.equals("2")) {
             DemandeDette demandeDette = demandeDetteView.getObject(demandeDettesEnCours);
+            
             demandeDetteView.afficherDemandeDette(demandeDette);
             motif('+');
             askDemandeDette(articleService, detteService, demandeDetteService, demandeDette, detailService, clientService);
@@ -454,7 +497,7 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
                 // Update Article
                 Article article = articleService.findBy(a.getArticle(), articleService.findAllAvailable());
                 article.setQteStock(article.getQteStock() - a.getQteArticle());
-                articleService.update(article, article.getQteStock());
+                articleService.update(article);
                 // Création détail
                 Detail detail = new Detail();
                 detail.setQte(a.getQteArticle());
@@ -463,12 +506,12 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
                 detail.setDette(dette);
                 // Ajout détail à la dette
                 dette.addDetail(detail);
-                // Transaction
-                detailService.add(detail);
             }
+            detteService.add(dette);
+            demandeDette.setDette(dette);
             demandeDette.setEtat(EtatDemandeDette.VALIDE);
             demandeDetteService.update(demandeDetteService.findAll(), demandeDette);
-            detteService.add(dette);
+            transactionDetail(detailService, dette);
             // Update dette client
             Client client = demandeDette.getClient();
             client.addDetteClient(dette);

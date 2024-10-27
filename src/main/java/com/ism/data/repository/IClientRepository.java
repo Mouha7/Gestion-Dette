@@ -7,8 +7,5 @@ import com.ism.data.entities.Client;
 
 public interface IClientRepository extends IRepository<Client> {
     List<Client> selectAllActifs();
-    void changeStatus(Client client, boolean state);
-    boolean selectOne(String client);
-    Client selectBy(Client client);
     List<Client> selectAllCustomerAvailable();
 }

@@ -2,6 +2,7 @@ package com.ism.views.admin.implement;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.Scanner;
 
@@ -177,12 +178,13 @@ public class ApplicationAdmin extends Application implements IApplicationAdmin {
 
     @Override
     public void soldes(IDetteService detteService, IDetteView detteView) {
-        if (isEmpty(detteService.length(), "Aucun compte soldé n'a été enregistré.")) {
+        if (isEmpty(detteService.getAllSoldes().size(), "Aucun dette soldé n'a été enregistré.")) {
             return;
         }
         Dette dette = detteView.getObject(detteService.getAllSoldes());
         boolean state = !dette.isStatus();
-        detteService.setStatus(dette, state);
+        dette.setStatus(state);
+        detteService.update(dette);
         msgStatus(state);
     }
 
@@ -192,8 +194,10 @@ public class ApplicationAdmin extends Application implements IApplicationAdmin {
             return;
         }
         Article article = articleView.getObject(articleService.findAll());
-        Integer newQte = Integer.valueOf(articleView.checked("Entrez la nouvelle quantité de l'article : ", "la quantité").toString());
-        articleService.setQte(article, newQte);
+        Integer newQte = Integer
+                .valueOf(articleView.checked("Entrez la nouvelle quantité de l'article : ", "la quantité").toString());
+        article.setQteStock(newQte);
+        articleService.update(article);
         msgSuccess("Modifiée avec succès !");
     }
 
@@ -250,16 +254,16 @@ public class ApplicationAdmin extends Application implements IApplicationAdmin {
     @Override
     public void activeDesactiveAccount(IUserService userService, IUserView userView, User userConnect) {
         List<User> users = userService.findAll()
-                            .stream()
-                            .filter(us -> us.getIdUser() != userConnect.getIdUser())
-                            .collect(Collectors.toList());
+                .stream()
+                .filter(us -> !Objects.equals(us.getId(), userConnect.getId()))
+                .collect(Collectors.toList());
         if (isEmpty(users.size(), "Aucun compte admin ou boutiquier ou client n'a été enregistré.")) {
             return;
         }
         User user = userView.getObject(users);
-        boolean state = !user.isStatus();
-        userService.setStatus(user, state);
-        msgStatus(state);
+        user.setStatus(!user.isStatus());
+        userService.update(users, user);
+        msgStatus(user.isStatus());
     }
 
     @Override
@@ -273,8 +277,8 @@ public class ApplicationAdmin extends Application implements IApplicationAdmin {
         User user = userView.accountCustomer(userService, client);
         if (user != null) {
             client.setUser(user);
-            clientService.update(clients, client);
             userService.add(user);
+            clientService.update(clients, client);
             msgSuccess(MSG_ACCOUNT);
         }
     }
