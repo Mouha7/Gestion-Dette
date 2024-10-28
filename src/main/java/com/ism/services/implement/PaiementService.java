@@ -1,9 +1,7 @@
 package com.ism.services.implement;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
-import java.util.Collections;
 
 import com.ism.data.entities.Paiement;
 import com.ism.data.repository.IPaiementRepository;
@@ -17,23 +15,13 @@ public class PaiementService implements IPaiementService {
     }
 
     @Override
-    public boolean add(Paiement value) {
-        try {
-            return paiementRepository.insert(value);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+    public Paiement add(Paiement value) {
+        return paiementRepository.insert(value);
     }
 
     @Override
     public List<Paiement> findAll() {
-        try {
-            return paiementRepository.selectAll();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Collections.emptyList();
+        return paiementRepository.selectAll();
     }
 
     @Override

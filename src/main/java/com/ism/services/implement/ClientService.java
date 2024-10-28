@@ -1,10 +1,8 @@
 package com.ism.services.implement;
 
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Collections;
 
 import com.ism.data.entities.Client;
 import com.ism.data.repository.IClientRepository;
@@ -18,23 +16,13 @@ public class ClientService implements IClientService {
     }
 
     @Override
-    public boolean add(Client client) {
-        try {
-            return clientRepository.insert(client);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+    public Client add(Client client) {
+        return clientRepository.insert(client);
     }
 
     @Override
     public List<Client> findAll() {
-        try {
-            return clientRepository.selectAll();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Collections.emptyList();
+        return clientRepository.selectAll();
     }
 
     @Override
@@ -50,7 +38,7 @@ public class ClientService implements IClientService {
     @Override
     public Client findBy(Client client) {
         for (Client cl : findAll()) {
-            if (Objects.equals(cl.getId(), client.getId())) {
+            if (cl.getId() == client.getId()) {
                 return cl;
             }
             if (client.getUser() != null && cl.getUser() != null
@@ -67,7 +55,7 @@ public class ClientService implements IClientService {
     @Override
     public Client findBy(List<Client> clients, Client client) {
         for (Client cl : clients) {
-            if (Objects.equals(cl.getId(), client.getId())) {
+            if (cl.getId() == client.getId()) {
                 return cl;
             }
             if (client.getUser() != null && cl.getUser() != null
@@ -94,11 +82,7 @@ public class ClientService implements IClientService {
 
     @Override
     public void update(List<Client> clients, Client updateClient) {
-        try {
-            updateClient.setUpdatedAt(LocalDateTime.now());
-            clientRepository.update(updateClient);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        updateClient.setUpdatedAt(LocalDateTime.now());
+        clientRepository.update(updateClient);
     }
 }

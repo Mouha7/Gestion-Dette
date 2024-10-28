@@ -1,9 +1,7 @@
 package com.ism.services.implement;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
-import java.util.Collections;
 
 import com.ism.data.entities.DemandeArticle;
 import com.ism.data.repository.IDemandeArticleRepository;
@@ -17,23 +15,13 @@ public class DemandeArticleService implements IDemandeArticleService {
     }
 
     @Override
-    public boolean add(DemandeArticle value) {
-        try {
-            return demandeArticleRepository.insert(value);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+    public DemandeArticle add(DemandeArticle value) {
+        return demandeArticleRepository.insert(value);
     }
 
     @Override
     public List<DemandeArticle> findAll() {
-        try {
-            return demandeArticleRepository.selectAll();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Collections.emptyList();
+        return demandeArticleRepository.selectAll();
     }
 
     @Override

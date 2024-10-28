@@ -4,24 +4,43 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.*;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = false, exclude = {"demandeDettes", "dettes"})
+@EqualsAndHashCode(callSuper = false, exclude = { "demandeDettes", "dettes", "user" })
+@Entity
+@Table(name = "clients")
 public class Client extends AbstractEntity {
+
+    @Column(unique = true, nullable = false, length = 100)
     private String surname;
+
+    @Column(unique = true, nullable = false, length = 20)
     private String tel;
+
+    @Column(length = 255)
     private String address;
+
+    @Column(name = "cumul_montant_du")
     private Double cumulMontantDu;
+
+    @Column(nullable = false)
     private boolean status;
 
-    // Navigabilité: revoir la pertinence de garder certain navigabilité
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "user_id", nullable = true)
     private User user;
-    private List<DemandeDette> demandeDettes;
-    private List<Dette> dettes;
+
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DemandeDette> demandeDettes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Dette> dettes = new ArrayList<>();
 
     public Client(Long id, LocalDateTime createdAt, LocalDateTime updatedAt, String surname, String tel, String address,
             Double cumulMontantDu, boolean status, User user) {
@@ -42,25 +61,25 @@ public class Client extends AbstractEntity {
     }
 
     public void addDemandeDette(DemandeDette demandeDette) {
-        if (demandeDettes == null) {
-            demandeDettes = new ArrayList<>();
-        }
         demandeDettes.add(demandeDette);
+        demandeDette.setClient(this);
     }
 
-    // Méthode modifiée pour mettre à jour le cumul lors de l'ajout d'une dette
     public void addDetteClient(Dette dette) {
-        if (dettes == null) {
-            dettes = new ArrayList<>();
-        }
         dettes.add(dette);
+        dette.setClient(this);
         updateCumulMontantDu();
     }
 
-    // Nouvelle méthode pour mettre à jour le cumul des dettes
+    // Modification de la méthode getCumulMontantDu pour éviter les accès lazy
+    public Double getCumulMontantDu() {
+        return this.cumulMontantDu;
+    }
+
+    // Méthode séparée pour mettre à jour le cumul
     public void updateCumulMontantDu() {
         double newCumul = 0.0;
-        if (dettes != null && !dettes.isEmpty()) {
+        if (dettes != null) {
             for (Dette dette : dettes) {
                 newCumul += dette.getMontantRestant();
             }
@@ -68,23 +87,10 @@ public class Client extends AbstractEntity {
         this.cumulMontantDu = newCumul;
     }
 
-    // Méthode modifiée pour obtenir le cumul actuel
-    public Double getCumulMontantDu() {
-        updateCumulMontantDu(); // Met à jour le cumul avant de le retourner
-        return cumulMontantDu;
-    }
-
-    // Nouvelle méthode pour mettre à jour le cumul après un paiement
-    public void updateCumulAfterPaiement(Dette dette, double montantPaye) {
-        if (dette != null && dettes.contains(dette)) {
-            updateCumulMontantDu();
-        }
-    }
-
     @Override
     public String toString() {
-        return "Client [id="+ super.getId() +", surname=" + surname + ", tel=" + tel + ", address=" + address + ", cumulMontantDu="
-                + cumulMontantDu + ", status=" + status + ", user=" + user + ", createAt=" + super.getCreatedAt()
-                + ", updateAt=" + super.getUpdatedAt() + "]";
+        return "Client [id=" + super.getId() + ", surname=" + surname + ", tel=" + tel + ", address=" + address +
+                ", cumulMontantDu=" + cumulMontantDu + ", status=" + status + ", user=" + user +
+                ", createAt=" + super.getCreatedAt() + ", updateAt=" + super.getUpdatedAt() + "]";
     }
 }

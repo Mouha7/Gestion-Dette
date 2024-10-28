@@ -5,7 +5,7 @@ import java.util.List;
 import com.ism.data.entities.User;
 
 public interface IUserService {
-    boolean add(User value);
+    User add(User value);
     List<User> findAll();
     User findBy(User user);
     User findBy(List<User> users, User user);

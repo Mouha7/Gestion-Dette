@@ -5,7 +5,7 @@ import java.util.List;
 import com.ism.data.entities.Client;
 
 public interface IClientService {
-    boolean add(Client value);
+    Client add(Client value);
     List<Client> findAll();
     int length();
     Client findBy(Client client);

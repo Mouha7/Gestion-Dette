@@ -1,9 +1,7 @@
 package com.ism.services.implement;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
-import java.util.Collections;
 
 import com.ism.data.entities.Article;
 import com.ism.data.repository.IArticleRepository;
@@ -17,23 +15,13 @@ public class ArticleService implements IArticleService {
     }
 
     @Override
-    public boolean add(Article value) {
-        try {
-            return articleRepository.insert(value);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;    
+    public Article add(Article value) {
+        return articleRepository.insert(value); 
     }
 
     @Override
     public List<Article> findAll() {
-        try {
-            return articleRepository.selectAll();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Collections.emptyList();
+        return articleRepository.selectAll();
     }
 
     @Override
@@ -62,10 +50,6 @@ public class ArticleService implements IArticleService {
 
     @Override
     public void update(Article article) {
-        try {
-            articleRepository.update(article);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        articleRepository.update(article);
     }
 }

@@ -1,6 +1,18 @@
 package com.ism.data.entities;
 
 import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -13,15 +25,27 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
+@Entity
+@Table(name = "demande_dettes")
 public class DemandeDette extends AbstractEntity {
+    @Column(name = "montant_total", nullable = false)
     private Double montantTotal;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "etat", nullable = false)
     private EtatDemandeDette etat;
 
-    // Nav
-    private List<DemandeArticle> demandeArticles;
-    private Dette dette;
-    private Client client;
+    @OneToMany(mappedBy = "demandeDette", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DemandeArticle> demandeArticles = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "dette_id")
+    private Dette dette;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "client_id", nullable = false)
+    private Client client;
+    
     public DemandeDette(Long id, LocalDateTime createdAt, LocalDateTime updatedAt, Double montantTotal,
             EtatDemandeDette etat, Dette dette, Client client) {
         super(id, createdAt, updatedAt);
@@ -32,9 +56,6 @@ public class DemandeDette extends AbstractEntity {
     }
 
     public void addDemandeArticle(DemandeArticle demandeArticle) {
-        if (demandeArticles == null) {
-            demandeArticles = new ArrayList<>();
-        }
         demandeArticles.add(demandeArticle);
     }
 
@@ -48,7 +69,7 @@ public class DemandeDette extends AbstractEntity {
     public String toString() {
         return "DemandeDette [idDemandeDette=" + super.getId() + ", dateDemande=" + super.getCreatedAt()
                 + ", montantTotal="
-                + montantTotal + ", etat=" + etat + ", dette=" + dette + ", client=" + client + ", updateAt="
+                + montantTotal + ", etat=" + etat + ", dette=" + (dette == null ? "N/A" : dette.getEtat()) + ", client=" + client + ", updateAt="
                 + super.getUpdatedAt() + "]";
     }
 }

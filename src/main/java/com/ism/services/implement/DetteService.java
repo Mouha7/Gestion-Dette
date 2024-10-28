@@ -1,9 +1,7 @@
 package com.ism.services.implement;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
-import java.util.Collections;
 
 import com.ism.data.entities.Dette;
 import com.ism.data.repository.IDetteRepository;
@@ -17,23 +15,13 @@ public class DetteService implements IDetteService {
     }
 
     @Override
-    public boolean add(Dette value) {
-        try {
-            return detteRepository.insert(value);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+    public Dette add(Dette value) {
+        return detteRepository.insert(value);
     }
 
     @Override
     public List<Dette> findAll() {
-        try {
-            return detteRepository.selectAll();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Collections.emptyList();
+        return detteRepository.selectAll();
     }
 
     @Override
@@ -43,12 +31,7 @@ public class DetteService implements IDetteService {
 
     @Override
     public Dette findBy(Dette dette) {
-        try {
-            return detteRepository.selectBy(dette.getId());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return detteRepository.selectBy(dette.getId());
     }
 
     @Override
@@ -73,10 +56,6 @@ public class DetteService implements IDetteService {
 
     @Override
     public void update(Dette updatedDette) {
-        try {
-            detteRepository.update(updatedDette);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        detteRepository.update(updatedDette);
     }
 }

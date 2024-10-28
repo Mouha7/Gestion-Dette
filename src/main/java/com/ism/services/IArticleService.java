@@ -5,7 +5,7 @@ import java.util.List;
 import com.ism.data.entities.Article;
 
 public interface IArticleService {
-    boolean add(Article value);
+    Article add(Article value);
     List<Article> findAll();
     void update(Article article);
     List<Article> findAllAvailable();

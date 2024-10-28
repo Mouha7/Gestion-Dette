@@ -1,10 +1,8 @@
 package com.ism.services.implement;
 
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Collections;
 
 import com.ism.data.entities.DemandeDette;
 import com.ism.data.repository.IDemandeDetteRepository;
@@ -18,23 +16,13 @@ public class DemandeDetteService implements IDemandeDetteService {
     }
 
     @Override
-    public boolean add(DemandeDette value) {
-        try {
-            return demandeDetteRepository.insert(value);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+    public DemandeDette add(DemandeDette value) {
+        return demandeDetteRepository.insert(value);
     }
 
     @Override
     public List<DemandeDette> findAll() {
-        try {
-            return demandeDetteRepository.selectAll();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Collections.emptyList();
+        return demandeDetteRepository.selectAll();
     }
 
     @Override
@@ -64,11 +52,7 @@ public class DemandeDetteService implements IDemandeDetteService {
 
     @Override
     public void update(List<DemandeDette> demandeDettes, DemandeDette updateDemande) {
-        try {
-            updateDemande.setUpdatedAt(LocalDateTime.now());
-            demandeDetteRepository.update(updateDemande);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        updateDemande.setUpdatedAt(LocalDateTime.now());
+        demandeDetteRepository.update(updateDemande);
     }
 }

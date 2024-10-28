@@ -5,7 +5,6 @@ import java.util.Scanner;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.ism.data.entities.DemandeArticle;
 import com.ism.data.entities.DemandeDette;
 import com.ism.data.entities.Detail;
 import com.ism.data.entities.Dette;
@@ -138,14 +137,8 @@ public class ApplicationClient extends Application implements IApplicationClient
             return;
         }
         demandeDetteService.add(dette);
-        transactionDemandeArticles(demandeArticleService, dette);
+        // transactionDemandeArticles(demandeArticleService, dette);
         msgSuccess("Demande de dette ajoutée avec succès.");
-    }
-
-    private void transactionDemandeArticles(IDemandeArticleService demandeArticleService, DemandeDette demandeDette) {
-        for (DemandeArticle a : demandeDette.getDemandeArticles()) {
-            demandeArticleService.add(a);
-        }
     }
 
     @Override

@@ -3,8 +3,6 @@ package com.ism.services.implement;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.sql.SQLException;
-import java.util.Collections;
 import java.time.LocalDateTime;
 
 import com.ism.data.entities.User;
@@ -19,23 +17,13 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public boolean add(User value) {
-        try {
-            return userRepository.insert(value);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+    public User add(User value) {
+        return userRepository.insert(value);
     }
 
     @Override
     public List<User> findAll() {
-        try {
-            return userRepository.selectAll();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Collections.emptyList();
+        return userRepository.selectAll();
     }
 
     @Override
@@ -51,7 +39,7 @@ public class UserService implements IUserService {
     @Override
     public User findBy(List<User> users, User user) {
         for (User us : users) {
-            if (Objects.equals(us.getId(), user.getId())) {
+            if (us.getId() == user.getId()) {
                 return us;
             }
             if (user.getLogin() != null && us.getLogin().compareTo(user.getLogin()) == 0) {
@@ -84,11 +72,7 @@ public class UserService implements IUserService {
 
     @Override
     public void update(List<User> users, User updateUser) {
-        try {
-            updateUser.setUpdatedAt(LocalDateTime.now());
-            userRepository.update(updateUser);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        updateUser.setUpdatedAt(LocalDateTime.now());
+        userRepository.update(updateUser);
     }
 }

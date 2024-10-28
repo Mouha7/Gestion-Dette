@@ -1,9 +1,19 @@
-// Méthode Eager Load pour tous récupérés
-Long clientId = rs.getLong("client_id");
-Long demandeDetteId = rs.getLong("demande_dette_id");
-Client client = null;
-DemandeDette demandeDette = null;
-if (!rs.wasNull()) {
-client = new ClientRepository(database).selectBy(clientId);
-demandeDette = new DemandeDetteRepository(database).selectBy(demandeDetteId);
-}
+@Override
+    public boolean insert(T data) {
+        boolean success = false;
+        try {
+            em = getEntityManager();
+            em.getTransaction().begin();
+            em.persist(data);
+            em.getTransaction().commit();
+            success = true;
+        } catch (PersistenceException e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.err.println("Échec de l'insertion : " + e.getMessage());
+        } finally {
+            closeEntityManager();
+        }
+        return success;
+    }

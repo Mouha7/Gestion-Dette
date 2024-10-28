@@ -1,6 +1,5 @@
 package com.ism.core.factory.implement;
 
-import com.ism.core.database.IDatabase;
 import com.ism.core.factory.IFactoryRepository;
 import com.ism.data.repository.IArticleRepository;
 import com.ism.data.repository.IClientRepository;
@@ -28,52 +27,44 @@ public class FactoryRepository implements IFactoryRepository {
     private IDetteRepository detteRepository;
     private IPaiementRepository paiementRepository;
     private IUserRepository userRepository;
-    private IDatabase database;
-
-    public FactoryRepository(IDatabase database) {
-        this.database = database;
-    }
 
     @Override
     public IArticleRepository getInstanceArticleRepository() {
-        return articleRepository == null ? new ArticleRepository(database) : articleRepository;
+        return articleRepository == null ? new ArticleRepository() : articleRepository;
     }
 
     @Override
     public IDemandeArticleRepository getInstanceDemandeArticleRepository() {
-        return demandeArticleRepository == null? new DemandeArticleRepository(database) : demandeArticleRepository;
+        return demandeArticleRepository == null ? new DemandeArticleRepository() : demandeArticleRepository;
     }
     
     @Override
     public IClientRepository getInstanceClientRepository() {
-        return clientRepository == null ? new ClientRepository(database) : clientRepository;
+        return clientRepository == null ? new ClientRepository() : clientRepository;
     }
 
     @Override
     public IDetailRepository getInstanceDetailRepository() {
-        return detailRepository == null ? new DetailRepository(database) : detailRepository;
+        return detailRepository == null ? new DetailRepository() : detailRepository;
     }
     
     @Override
     public IDemandeDetteRepository getInstanceDemandeDetteRepository() {
-        return demandeDetteRepository == null ? new DemandeDetteRepository(database) : demandeDetteRepository;
+        return demandeDetteRepository == null ? new DemandeDetteRepository() : demandeDetteRepository;
     }
 
     @Override
     public IDetteRepository getInstanceDetteRepository() {
-        return detteRepository == null ? new DetteRepository(database) : detteRepository;
+        return detteRepository == null ? new DetteRepository() : detteRepository;
     }
 
     @Override
     public IPaiementRepository getInstancePaiementRepository() {
-        return paiementRepository == null ? new PaiementRepository(database) : paiementRepository;
+        return paiementRepository == null ? new PaiementRepository() : paiementRepository;
     }
 
     @Override
     public IUserRepository getInstanceUserRepository() {
-        if (userRepository == null) {
-            userRepository = new UserRepository(database);
-        }
-        return userRepository;
+        return userRepository  == null ? new UserRepository() : userRepository;
     }
 }

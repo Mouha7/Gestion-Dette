@@ -1,7 +1,5 @@
 package com.ism.core.factory.implement;
 
-import com.ism.core.database.IDatabase;
-import com.ism.core.database.implement.Database;
 import com.ism.core.factory.IFactory;
 import com.ism.core.factory.IFactoryRepository;
 import com.ism.core.factory.IFactoryService;
@@ -12,11 +10,9 @@ public class Factory implements IFactory {
     private IFactoryRepository factoryRepository;
     private IFactoryService factoryService;
     private IFactoryView factoryView;
-    private IDatabase database;
 
     private Factory() {
-        this.database = new Database();
-        this.factoryRepository = new FactoryRepository(this.database);
+        this.factoryRepository = new FactoryRepository();
         this.factoryService = new FactoryService(this.factoryRepository);
         this.factoryView = new FactoryView(this.factoryService);
     }

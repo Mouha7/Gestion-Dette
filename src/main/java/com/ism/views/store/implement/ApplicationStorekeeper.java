@@ -136,7 +136,6 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
             if (user == null) {
                 return;
             }
-            userService.add(user);
             client.setUser(user);
         }
         clientService.add(client);
@@ -253,22 +252,16 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
             dette = (Dette) result[1];
             dette.addPaiement(paiement);
             // Mise à jour du cumul après le paiement
-            client.updateCumulAfterPaiement(dette, paiement.getMontantPaye());
+            client.updateCumulMontantDu();
         }
         // Transaction
         client.addDetteClient(dette);
         detteService.add(dette);
-        transactionDetail(detailService, dette);
+        // transactionDetail(detailService, dette);
         // Mise à jour du client dans la base de données
         client.updateCumulMontantDu();
         clientService.update(clientService.findAll(), client);
         msgSuccess("Dette effectué avec succès!");
-    }
-
-    private void transactionDetail(IDetailService detailService, Dette dette) {
-        for (Detail d : dette.getDetails()) {
-            detailService.add(d);
-        }
     }
 
     private Object[] getPaiementClient(IPaiementView paiementView, Dette dette) {
@@ -372,7 +365,6 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
             System.out.println("Aucune dette n'a été enregistré.");
             return;
         }
-
         Dette dette = detteView.getObject(dettes);
         Object[] result = getPaiementClient(paiementView, dette);
         Paiement paiement = (Paiement) result[0];
@@ -381,7 +373,7 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
         dette.addPaiement(paiement);
         // Mise à jour du cumul du client après le paiement
         Client client = dette.getClient();
-        client.updateCumulAfterPaiement(dette, paiement.getMontantPaye());
+        client.updateCumulMontantDu();
         // Update toutes les entités
         detteService.update(dette);
         paiementService.add(paiement);
@@ -444,7 +436,6 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
             subMenuDemandeDette(demandeDetteService, demandeDetteView);
         } else if (choice.equals("2")) {
             DemandeDette demandeDette = demandeDetteView.getObject(demandeDettesEnCours);
-            
             demandeDetteView.afficherDemandeDette(demandeDette);
             motif('+');
             askDemandeDette(articleService, detteService, demandeDetteService, demandeDette, detailService, clientService);
@@ -511,7 +502,7 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
             demandeDette.setDette(dette);
             demandeDette.setEtat(EtatDemandeDette.VALIDE);
             demandeDetteService.update(demandeDetteService.findAll(), demandeDette);
-            transactionDetail(detailService, dette);
+            // transactionDetail(detailService, dette);
             // Update dette client
             Client client = demandeDette.getClient();
             client.addDetteClient(dette);

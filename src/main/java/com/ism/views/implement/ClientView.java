@@ -96,27 +96,39 @@ public class ClientView extends ImpView<Client> implements IClientView {
         System.out.println("Surname : " + client.getSurname());
         System.out.println("Tel : " + client.getTel());
         System.out.println("Adresse : " + client.getAddress());
-        System.out.println("Cumul Montant Dû : " + client.getCumulMontantDu());
+        System.out.println("Cumul Montant Dû : " + client.getCumulMontantDu() + "Franc CFA");
         System.out.println("Status : " + client.isStatus());
         System.out.println("User : " + (client.getUser() == null ? "N/A" : client.getUser()));
-        if (client.getDemandeDettes() != null) {
+        displayDemandeDette(client);
+        displayDette(client);
+        motif("+");
+    }
+
+    private void displayDemandeDette(Client client) {
+        List<DemandeDette> demandeDettes = client.getDemandeDettes();
+        if (!demandeDettes.isEmpty()) {
             motif("-");
             System.out.println("Liste Demande de dette : ");
-            for (DemandeDette dette : client.getDemandeDettes()) {
-                System.out.println("Montant Total: " + dette.getMontantTotal());
-                System.out.println("Date: " + dette.getId());
+            for (DemandeDette dette : demandeDettes) {
+                System.out.println("Montant Total: " + dette.getMontantTotal() + "Franc CFA");
+                System.out.println("Date: " + dette.getCreatedAt());
                 System.out.println("Etat: " + dette.getEtat());
+                motif("-");
             }
         } else {
             System.out.println("Liste des demandes de dette : N/A");
         }
-        if (client.getDettes() != null) {
+    }
+
+    private void displayDette(Client client) {
+        List<Dette> dettes = client.getDettes();
+        if (!dettes.isEmpty()) {
             motif("-");
             System.out.println("Liste de dette : ");
-            for (Dette dette : client.getDettes()) {
-                System.out.println("Montant Total: " + dette.getMontantTotal());
-                System.out.println("Montant Verser: " + dette.getMontantVerser());
-                System.out.println("Montant Restant: " + dette.getMontantRestant());
+            for (Dette dette : dettes) {
+                System.out.println("Montant Total: " + dette.getMontantTotal() + "Franc CFA");
+                System.out.println("Montant Verser: " + dette.getMontantVerser() + "Franc CFA");
+                System.out.println("Montant Restant: " + dette.getMontantRestant() + "Franc CFA");
                 System.out.println("Status: " + dette.isStatus());
                 System.out.println("État: " + dette.getEtat());
                 System.out.println("Date: " + dette.getCreatedAt());
@@ -124,7 +136,6 @@ public class ClientView extends ImpView<Client> implements IClientView {
         } else {
             System.out.println("Liste des dettes : N/A");
         }
-        motif("+");
     }
 
     @Override

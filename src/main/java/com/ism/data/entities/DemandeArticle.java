@@ -2,6 +2,13 @@ package com.ism.data.entities;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,11 +16,18 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
+@Entity
+@Table(name = "demande_articles")
 public class DemandeArticle extends AbstractEntity {
+    @Column(name = "qte_article", nullable = false)
     private int qteArticle;
 
-    // Nav
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "article_id", nullable = false)
     private Article article;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "demande_dette_id", nullable = false)
     private DemandeDette demandeDette;
 
     public DemandeArticle(Long id, LocalDateTime createdAt, LocalDateTime updatedAt, int qteArticle, Article article,

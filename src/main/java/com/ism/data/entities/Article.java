@@ -4,6 +4,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,14 +17,24 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
+@Entity
+@Table(name = "articles")
 public class Article extends AbstractEntity {
+    @Column(name = "libelle", nullable = false)
     private String libelle;
+    
+    @Column(name = "prix", nullable = false)
     private Double prix;
+    
+    @Column(name = "qte_stock", nullable = false)
     private Integer qteStock;
 
-    // Nav ==> ce n'est pas utile
-    private List<Detail> details;
-    private List<DemandeArticle> demandeArticles;
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Detail> details = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DemandeArticle> demandeArticles = new ArrayList<>();
+
 
     public Article() {
         super.createdAt = LocalDateTime.now();
@@ -34,9 +50,6 @@ public class Article extends AbstractEntity {
     }
 
     public void addDetail(Detail detail) {
-        if (demandeArticles == null) {
-            details = new ArrayList<>();
-        }
         details.add(detail);
     }
 
