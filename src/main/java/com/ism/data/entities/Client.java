@@ -89,8 +89,10 @@ public class Client extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "Client [id=" + super.getId() + ", surname=" + surname + ", tel=" + tel + ", address=" + address +
-                ", cumulMontantDu=" + cumulMontantDu + ", status=" + status + ", user=" + user +
-                ", createAt=" + super.getCreatedAt() + ", updateAt=" + super.getUpdatedAt() + "]";
+        String display = "Surname : " + surname + ", Tel : " + tel + ", Adresse : " + address;
+        // return "Client [id=" + super.getId() + ", surname=" + surname + ", tel=" + tel + ", address=" + address +
+        //         ", cumulMontantDu=" + cumulMontantDu + ", status=" + status + ", user=" + user +
+        //         ", createAt=" + super.getCreatedAt() + ", updateAt=" + super.getUpdatedAt() + "]";
+        return display;
     }
 }

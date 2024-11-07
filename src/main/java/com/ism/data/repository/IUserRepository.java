@@ -8,4 +8,6 @@ import com.ism.data.entities.User;
 public interface IUserRepository extends IRepository<User> {
     List<User> selectAllActifs(int type);
     User selectByLogin(String login, String password);
+    List<User> selectAllClients();
+    List<User> selectAllUsers(User userConnect);
 }

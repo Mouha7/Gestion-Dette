@@ -13,4 +13,8 @@ public interface IUserService {
     User getByLogin(String login, String password);
     int length();
     void update(List<User> users, User updateUser);
+    int lengthUserActif();
+    List<User> getAllActifs(int type);
+    List<User> findAllClients();
+    List<User> findAllUsers(User userConnect);
 }

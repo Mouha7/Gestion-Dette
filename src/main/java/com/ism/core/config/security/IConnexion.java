@@ -1,7 +1,7 @@
 package com.ism.core.config.security;
 
-import com.ism.data.entities.User;
+import javafx.event.ActionEvent;
 
 public interface IConnexion {
-    User connexion();
+    void connexion(ActionEvent e);
 }

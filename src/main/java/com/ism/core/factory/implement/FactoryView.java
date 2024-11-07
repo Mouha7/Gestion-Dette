@@ -2,18 +2,18 @@ package com.ism.core.factory.implement;
 
 import com.ism.core.factory.IFactoryService;
 import com.ism.core.factory.IFactoryView;
-import com.ism.views.IArticleView;
-import com.ism.views.IClientView;
-import com.ism.views.IDemandeDetteView;
-import com.ism.views.IDetteView;
-import com.ism.views.IPaiementView;
-import com.ism.views.IUserView;
-import com.ism.views.implement.ArticleView;
-import com.ism.views.implement.ClientView;
-import com.ism.views.implement.DemandeDetteView;
-import com.ism.views.implement.DetteView;
-import com.ism.views.implement.PaiementView;
-import com.ism.views.implement.UserView;
+import com.ism.controllers.IArticleView;
+import com.ism.controllers.IClientView;
+import com.ism.controllers.IDemandeDetteView;
+import com.ism.controllers.IDetteView;
+import com.ism.controllers.IPaiementView;
+import com.ism.controllers.IUserView;
+import com.ism.controllers.implement.ArticleView;
+import com.ism.controllers.implement.ClientView;
+import com.ism.controllers.implement.DemandeDetteView;
+import com.ism.controllers.implement.DetteView;
+import com.ism.controllers.implement.PaiementView;
+import com.ism.controllers.implement.UserView;
 
 public class FactoryView implements IFactoryView {
     private IArticleView articleView;
@@ -56,7 +56,7 @@ public class FactoryView implements IFactoryView {
     @Override
     public IUserView getInstanceUserView() {
         if (userView == null) {
-            userView = new UserView(factoryService.getInstanceUserService());
+            userView = new UserView(factoryService.getInstanceUserService(), factoryService.getInstanceClientService());
         }
         return userView;
     }

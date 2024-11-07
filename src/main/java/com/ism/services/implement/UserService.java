@@ -27,6 +27,16 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public List<User> findAllClients() {
+        return userRepository.selectAllClients();
+    }
+
+    @Override
+    public List<User> findAllUsers(User userConnect) {
+        return userRepository.selectAllUsers(userConnect);
+    }
+
+    @Override
     public User findBy(User user) {
         for (User us : findAll()) {
             if (Objects.equals(us.getId(), user.getId())) {
@@ -58,6 +68,19 @@ public class UserService implements IUserService {
                 .stream()
                 .filter(us -> !Objects.equals(us.getId(), userConnect.getId()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> getAllActifs(int type) {
+        return userRepository.selectAllActifs(type)
+                .stream()
+                .filter(us -> us.getClient() != null)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public int lengthUserActif() {
+        return userRepository.selectAllActifs(0).size() + userRepository.selectAllActifs(1).size() + userRepository.selectAllActifs(2).size();
     }
 
     @Override

@@ -1,10 +1,10 @@
 package com.ism.core.config.router;
 
+import java.io.IOException;
 import java.util.Scanner;
 
-import com.ism.core.config.security.Connexion;
-import com.ism.core.config.security.IConnexion;
 import com.ism.core.factory.IFactory;
+import com.ism.core.helper.Tools;
 import com.ism.data.entities.User;
 import com.ism.services.IArticleService;
 import com.ism.services.IClientService;
@@ -14,22 +14,24 @@ import com.ism.services.IDetailService;
 import com.ism.services.IDetteService;
 import com.ism.services.IPaiementService;
 import com.ism.services.IUserService;
-import com.ism.views.IArticleView;
-import com.ism.views.IClientView;
-import com.ism.views.IDemandeDetteView;
-import com.ism.views.IDetteView;
-import com.ism.views.IPaiementView;
-import com.ism.views.IUserView;
-import com.ism.views.admin.IApplicationAdmin;
-import com.ism.views.admin.implement.ApplicationAdmin;
-import com.ism.views.client.IApplicationClient;
-import com.ism.views.client.implement.ApplicationClient;
-import com.ism.views.store.IApplicationStorekeeper;
-import com.ism.views.store.implement.ApplicationStorekeeper;
+
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+
+import com.ism.controllers.IClientView;
+import com.ism.controllers.IDemandeDetteView;
+import com.ism.controllers.IDetteView;
+import com.ism.controllers.IPaiementView;
+import com.ism.controllers.IUserView;
+import com.ism.controllers.admin.IApplicationAdmin;
+import com.ism.controllers.admin.implement.ApplicationAdmin;
+import com.ism.controllers.client.IApplicationClient;
+import com.ism.controllers.client.implement.ApplicationClient;
+import com.ism.controllers.store.IApplicationStorekeeper;
+import com.ism.controllers.store.implement.ApplicationStorekeeper;
 
 public class Router implements IRouter {
     private final IArticleService articleService;
-    private final IArticleView articleView;
     private final IClientService clientService;
     private final IClientView clientView;
     private final IDemandeDetteService demandeDetteService;
@@ -47,11 +49,12 @@ public class Router implements IRouter {
     private final IApplicationClient appClient;
     private final IApplicationStorekeeper appStorekeeper;
     private final Scanner scanner;
-    private final IConnexion conn;
+
+    public static User userConnect;
+    public static String userParams;
 
     public Router(IFactory factory, Scanner scanner) {
         this.articleService = factory.getFactoryService().getInstanceArticleService();
-        this.articleView = factory.getFactoryView().getInstanceArticleView();
         this.clientService = factory.getFactoryService().getInstanceClientService();
         this.clientView = factory.getFactoryView().getInstanceClientView();
         this.demandeDetteService = factory.getFactoryService().getInstanceDemandeDetteService();
@@ -66,30 +69,37 @@ public class Router implements IRouter {
         this.userView = factory.getFactoryView().getInstanceUserView();
         this.scanner = scanner;
 
-        this.appAdmin = new ApplicationAdmin(this.articleService, this.articleView, this.clientService, this.clientView, this.detteService, this.detteView, this.userService, this.userView, this.scanner);
-        this.appClient = new ApplicationClient(this.articleService, clientService, this.demandeDetteService, this.demandeDetteView, this.demandeArticleService, this.detteService, this.detteView, this.scanner);
-        this.appStorekeeper = new ApplicationStorekeeper(this.articleService, this.clientService, this.clientView, this.demandeDetteService, this.demandeDetteView, this.detailService, this.detteService, this.detteView, this.paiementService, this.paiementView, userService, userView, this.scanner);
-        this.conn = new Connexion(this.userService, this.scanner);
+        this.appAdmin = new ApplicationAdmin(this.scanner);
+        this.appClient = new ApplicationClient(this.articleService, clientService, this.demandeDetteService,
+                this.demandeDetteView, this.demandeArticleService, this.detteService, this.detteView, this.scanner);
+        this.appStorekeeper = new ApplicationStorekeeper(this.articleService, this.clientService, this.clientView,
+                this.demandeDetteService, this.demandeDetteView, this.detailService, this.detteService, this.detteView,
+                this.paiementService, this.paiementView, userService, userView, this.scanner);
     }
 
+    @FXML
     @Override
-    public void navigate() {
-        User user;
-        do {
-            user = conn.connexion();
-            switch (user.getRole().name()) {
-                case "ADMIN":
-                    appAdmin.run(user); 
-                    break;
-                case "CLIENT":
-                    appClient.run(user);
-                    break;
-                case "BOUTIQUIER":
-                    appStorekeeper.run(user);
-                    break;
-                default:
-                    break;
-            }
-        } while (user != null);
+    public void navigate(ActionEvent e, User user) {
+        userConnect = user;
+        switch (user.getRole().name()) {
+            case "ADMIN":
+                try {
+                    userParams = "Vous êtes connecté en tant que Admin (" + user.getLogin() + "🔴)";
+                    Tools.load(e, "Gestion de Dette", "/com/ism/views/dashboard.admin.fxml");
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                break;
+            case "CLIENT":
+                userParams = "Vous êtes connecté en tant que Client (" + user.getLogin() + "🔴)";
+                appClient.run(user);
+                break;
+            case "BOUTIQUIER":
+                userParams = "Vous êtes connecté en tant que Boutiquier (" + user.getLogin() + "🔴)";
+                appStorekeeper.run(user);
+                break;
+            default:
+                break;
+        }
     }
 }

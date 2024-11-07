@@ -1,52 +1,100 @@
 package com.ism.core.config.security;
 
+import java.lang.String;
+import java.net.URL;
+import java.util.ResourceBundle;
 import java.util.Scanner;
-import java.time.LocalDateTime;
 
-import com.ism.core.helper.PasswordUtils;
+import com.ism.controllers.implement.ImpView;
+import com.ism.core.config.router.IRouter;
+import com.ism.core.config.router.Router;
+import com.ism.core.factory.IFactory;
+import com.ism.core.factory.implement.Factory;
+import com.ism.core.helper.Errors;
 import com.ism.data.entities.User;
-import com.ism.data.enums.Role;
+import com.ism.data.repository.implement.UserRepository;
 import com.ism.services.IUserService;
+import com.ism.services.implement.UserService;
 
-public class Connexion implements IConnexion {
-    private Scanner scanner;
-    private IUserService userService;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 
-    public Connexion(IUserService userService, Scanner scanner) {
-        this.userService = userService;
-        this.scanner = scanner;
-        User user = new User( LocalDateTime.now(), LocalDateTime.now(), "admin@admin.sn", "a", PasswordUtils.hashPassword("a"), true, Role.ADMIN);
-        userService.add(user);
-        User client = new User(LocalDateTime.now(), LocalDateTime.now(), "client@admin.sn", "c", PasswordUtils.hashPassword("c"), true, Role.CLIENT);
-        userService.add(client);
-        User boutiquier = new User(LocalDateTime.now(), LocalDateTime.now(), "boutiquier@admin.sn", "b", PasswordUtils.hashPassword("b"), true, Role.BOUTIQUIER);
-        userService.add(boutiquier);
+public class Connexion implements IConnexion, Initializable {
+    private IUserService userService = new UserService(new UserRepository());
+
+    private Scanner scanner = new Scanner(System.in);
+
+    // Récupération des données saisie
+    private StackPane errorContainer;
+    @FXML
+    private TextField loginField;
+    @FXML
+    private PasswordField passwordField;
+
+    public Connexion() {
     }
-    
+
     @Override
-    public User connexion() {
-        User user = null;
-        do {
-            System.out.println("Bienvenue sur l'application de gestion de dette");
-            System.out.println("Veuillez-vous connecter");
-            // Demander le login
-            System.out.print("Login : ");
-            String login = scanner.nextLine();
-            // Demander le mot de passe
-            System.out.print("Password : ");
-            String password = scanner.nextLine();
-            // Récupération de l'utilisateur par login et mot de passe
-            user = userService.getByLogin(login, password);
-            // Vérification des conditions de connexion
-            if (user == null) {
-                System.out.println("Login ou Mot de passe incorrect.");
-            } else if (!user.isStatus()) {
-                System.out.println("Votre compte est désactivé.");
-                user = null; // Pour forcer la boucle à redemander les identifiants
-            }
-        } while (user == null); // Tant que l'utilisateur est null (mauvais login ou compte désactivé)
-        // Retourne l'utilisateur authentifié
-        return user;
+    public void initialize(URL arg0, ResourceBundle arg1) {
+        // Créer le StackPane
+        errorContainer = new StackPane();
+
+        // Récupérer le parent actuel des champs
+        Pane parent = (Pane) loginField.getParent();
+
+        // Ajouter le StackPane au début des enfants
+        parent.getChildren().add(0, errorContainer);
+
+        // Configurer la taille du StackPane
+        errorContainer.setPrefWidth(parent.getWidth());
+        errorContainer.setPrefHeight(50); // hauteur pour le message d'erreur
     }
-    
+
+    @Override
+    @FXML
+    public void connexion(ActionEvent e) {
+        String login = loginField.getText();
+        String password = passwordField.getText();
+        // Récupérer le Stage actuel à partir de n'importe quel élément de la scène
+        Stage stage = (Stage) loginField.getScene().getWindow();
+
+        if (login.isEmpty() || password.isEmpty()) {
+            // Afficher le popup d'erreur
+            Errors.showCustomPopup(stage, "Login ou mot de passe ne doit pas être vide");
+            return;
+        }
+
+        User user = null;
+        user = userService.getByLogin(login, password);
+        if (user == null) {
+            // Choisissez la méthode qui vous convient le mieux
+            Errors.showCustomPopup(stage, "Nom d'utilisateur ou mot de passe incorrect");
+            return;
+        } else if (!user.isStatus()) {
+            Errors.showErrorMsg("Compte Bloqué !", "Votre compte est désactivé.");
+            return;
+        }
+        reset();
+        // Retourne l'utilisateur authentifié
+        switchAfterLogin(e, user);
+    }
+
+    public void reset() {
+        // Réinitialiser les champs
+        loginField.clear();
+        passwordField.clear();
+    }
+
+    private void switchAfterLogin(ActionEvent e, User user) {
+        ImpView.setScanner(this.scanner);
+        IFactory factory = Factory.getInstance();
+        IRouter router = new Router(factory, scanner);
+        router.navigate(e, user);
+    }
 }
