@@ -50,7 +50,8 @@ public class Dette extends AbstractEntity {
     @JoinColumn(name = "demande_dette_id")
     private DemandeDette demandeDette;
 
-    // Relation avec Paiement, cascade pour sauvegarder automatiquement les paiements liés
+    // Relation avec Paiement, cascade pour sauvegarder automatiquement les
+    // paiements liés
     @OneToMany(mappedBy = "dette", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Paiement> paiements = new ArrayList<>();
 
@@ -93,6 +94,7 @@ public class Dette extends AbstractEntity {
         return "Dette [idDette=" + super.getId() + ", montantTotal=" + montantTotal + ", montantVerser=" + montantVerser
                 + ", status=" + status + ", etat=" + etat + ", dateCreation=" + super.getCreatedAt() + ", client="
                 + client
-                + ", demandeDette=" + (demandeDette == null ? "N/A" : demandeDette.getEtat()) + ", updateAt=" + super.getUpdatedAt() + "]";
+                + ", demandeDette=" + (demandeDette == null ? "N/A" : demandeDette.getEtat()) + ", updateAt="
+                + super.getUpdatedAt() + "]";
     }
 }

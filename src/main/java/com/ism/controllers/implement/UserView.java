@@ -111,12 +111,9 @@ public class UserView extends ImpView<User> implements IUserView, Initializable 
     // <<
     private Long userId;
 
-    public UserView(IUserService userService, IClientService clientService) {
+    public UserView() {
         this.userService = factory.getFactoryService().getInstanceUserService();
         this.clientService = factory.getFactoryService().getInstanceClientService();
-    }
-
-    public UserView() {
     }
 
     @Override
@@ -147,7 +144,7 @@ public class UserView extends ImpView<User> implements IUserView, Initializable 
             usersFX.add(u);
         }
         usersTable.setItems(usersFX);
-        // >>Initialiser les colonnes de la table usersTable ici
+        // >> Initialiser les colonnes de la table usersTable ici
         idUserCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         emailUserCol.setCellValueFactory(new PropertyValueFactory<>("email"));
         loginUserCol.setCellValueFactory(new PropertyValueFactory<>("login"));
@@ -161,12 +158,11 @@ public class UserView extends ImpView<User> implements IUserView, Initializable 
         if (userAllTable == null)
             return;
         ObservableList<User> usersFX = FXCollections.observableArrayList();
-        // List<User> users = userService.findAllUsers(Router.userConnect);
         for (User u : users) {
             usersFX.add(u);
         }
         userAllTable.setItems(usersFX);
-        // >>Initialiser les colonnes de la table usersTable ici
+        // >> Initialiser les colonnes de la table usersTable ici
         idAllCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         emailAllCol.setCellValueFactory(new PropertyValueFactory<>("email"));
         loginAllCol.setCellValueFactory(new PropertyValueFactory<>("login"));
@@ -501,24 +497,6 @@ public class UserView extends ImpView<User> implements IUserView, Initializable 
         user.setRole(Role.values()[typeRole() - 1]);
         user.setStatus(true);
         return user;
-    }
-
-    private boolean checkLogin(String login) {
-        // Regex pour un login valide
-        String loginRegex = "^[a-zA-Z0-9_-]{5,}$";
-        if (login.matches(loginRegex)) {
-            return true;
-        }
-        return false;
-    }
-
-    private boolean checkEmail(String email) {
-        // Regex pour un email valide
-        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
-        if (email.matches(emailRegex)) {
-            return true;
-        }
-        return false;
     }
 
     @Override

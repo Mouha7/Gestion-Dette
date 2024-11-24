@@ -26,8 +26,10 @@ module com.ism {
     exports com.ism.data.repository;
     exports com.ism.data.repository.implement;
     exports com.ism.data.enums;
-    exports com.ism.controllers.admin.implement;
     exports com.ism.controllers.implement;
+    exports com.ism.controllers.admin.implement;
+    exports com.ism.controllers.store.implement;
+    exports com.ism.controllers.client.implement;
     
     opens com.ism.core.helper to org.controlsfx.controls, javafx.controls, javafx.fxml;
     opens com.ism.data.entities to org.hibernate.orm.core;
@@ -35,6 +37,8 @@ module com.ism {
     opens com.ism.controllers to javafx.fxml;
     opens com.ism.services to com.ism.core.repository;
     opens com.ism.core.config.security to javafx.fxml, com.ism.services;
-    opens com.ism.controllers.admin.implement to javafx.fxml;
     opens com.ism.controllers.implement to javafx.fxml;
+    opens com.ism.controllers.admin.implement to javafx.fxml;
+    opens com.ism.controllers.store.implement to javafx.fxml;
+    opens com.ism.controllers.client.implement to javafx.fxml;
 }

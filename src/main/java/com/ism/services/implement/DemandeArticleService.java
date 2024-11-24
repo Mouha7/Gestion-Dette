@@ -2,8 +2,10 @@ package com.ism.services.implement;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.ism.data.entities.DemandeArticle;
+import com.ism.data.entities.User;
 import com.ism.data.repository.IDemandeArticleRepository;
 import com.ism.services.IDemandeArticleService;
 
@@ -32,6 +34,13 @@ public class DemandeArticleService implements IDemandeArticleService {
             }
         }
         return null;
+    }
+
+    public List<DemandeArticle> findAllDemandeDette(User user) {
+        return demandeArticleRepository.selectAll()
+                .stream()
+                .filter(article -> user != null && user.getId() == article.getDemandeDette().getClient().getUser().getId())
+                .collect(Collectors.toList());
     }
 
     @Override

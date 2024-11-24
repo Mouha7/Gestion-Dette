@@ -12,5 +12,6 @@ public interface IClientService {
     Client findBy(List<Client> clients, Client client);
     List<Client> getAllActifs();
     List<Client> findAllCustomerAvailable();
+    List<Client> getAllActifsWithAccount();
     void update(List<Client> clients, Client updateClient);
 }

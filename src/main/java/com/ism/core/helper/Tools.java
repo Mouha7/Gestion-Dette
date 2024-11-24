@@ -9,7 +9,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 public class Tools {
     public static void showConfirmationMsg(String title, String msg) {
@@ -27,11 +29,19 @@ public class Tools {
     }
 
     private void loadPage(ActionEvent e, String title, String url) throws IOException {
-        ((Node) e.getSource()).getScene().getWindow().hide();
-
+        if (e.getSource() instanceof MenuItem) {
+            // Obtenir l'item de menu qui a déclenché l'événement
+            MenuItem menuItem = (MenuItem) e.getSource();
+            // Obtenir la fenêtre depuis le menu
+            Window window = menuItem.getParentPopup().getOwnerWindow();
+            window.hide();
+        } else {
+            ((Node) e.getSource()).getScene().getWindow().hide();
+        }
+        
         FXMLLoader loader = new FXMLLoader(getClass().getResource(url));
         Parent root = loader.load();
-
+        
         Scene scene = new Scene(root);
         Stage stage = new Stage();
         stage.setTitle(title);

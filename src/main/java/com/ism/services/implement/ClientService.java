@@ -3,6 +3,7 @@ package com.ism.services.implement;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.ism.data.entities.Client;
 import com.ism.data.repository.IClientRepository;
@@ -78,6 +79,14 @@ public class ClientService implements IClientService {
     @Override
     public List<Client> getAllActifs() {
         return clientRepository.selectAllActifs();
+    }
+
+    @Override
+    public List<Client> getAllActifsWithAccount() {
+        return clientRepository.selectAllActifs()
+                .stream()
+                .filter(cl -> cl.getUser() != null)
+                .collect(Collectors.toList());
     }
 
     @Override

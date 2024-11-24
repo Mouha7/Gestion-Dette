@@ -61,7 +61,7 @@ public abstract class Repository<T> implements IRepository<T> {
     public List<T> selectAll() {
         EntityManager em = getEntityManager();
         try {
-            String query = String.format("SELECT u FROM %s u", type.getName());
+            String query = String.format("SELECT u FROM %s u ORDER BY id ASC", type.getName());
             return em.createQuery(query, type).getResultList();
         } catch (Exception e) {
             System.err.println("Échec de la récupération des données : " + e.getMessage());

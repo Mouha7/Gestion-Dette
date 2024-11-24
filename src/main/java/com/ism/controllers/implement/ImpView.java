@@ -44,4 +44,22 @@ public abstract class ImpView<T> implements IView<T> {
     public void motif(String letter, int nbr) {
         System.out.println(String.valueOf(letter).repeat(nbr));
     }
+
+    public boolean checkEmail(String email) {
+        // Regex pour un email valide
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        if (email.matches(emailRegex)) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean checkLogin(String login) {
+        // Regex pour un login valide
+        String loginRegex = "^[a-zA-Z0-9_-]{5,}$";
+        if (login.matches(loginRegex)) {
+            return true;
+        }
+        return false;
+    }
 }

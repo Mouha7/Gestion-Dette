@@ -8,4 +8,6 @@ public interface IView<T> {
     T getObject(List<T> list);
     void motif(String letter);
     void motif(String letter, int nbr);
+    boolean checkEmail(String email);
+    boolean checkLogin(String login);
 }

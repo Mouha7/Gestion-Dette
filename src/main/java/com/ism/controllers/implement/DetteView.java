@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import com.ism.data.entities.Client;
 import com.ism.data.entities.Detail;
 import com.ism.data.entities.Dette;
 import com.ism.data.entities.Paiement;
@@ -23,6 +24,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import com.ism.controllers.IDetteView;
+import com.ism.core.config.router.Router;
 import com.ism.core.factory.IFactory;
 import com.ism.core.factory.implement.Factory;
 import com.ism.core.helper.Success;
@@ -35,6 +37,7 @@ public class DetteView extends ImpView<Dette> implements IDetteView, Initializab
     private Button btnArchive;
     @FXML
     private TableView<Dette> detteTable;
+    public TableView<Dette> detteNonSoldTable;
     @FXML
     private TableColumn<Dette, Integer> idDetteCol;
     @FXML
@@ -63,6 +66,7 @@ public class DetteView extends ImpView<Dette> implements IDetteView, Initializab
     public void initialize(URL arg0, ResourceBundle arg1) {
         this.detteService = factory.getFactoryService().getInstanceDetteService();
         load();
+        loadDetteNonSold();
     }
 
     public void load() {
@@ -78,6 +82,27 @@ public class DetteView extends ImpView<Dette> implements IDetteView, Initializab
         // >>Initialiser les colonnes de la table usersTable ici
         idDetteCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         clientDetteCol.setCellValueFactory(new PropertyValueFactory<>("client"));
+        montantTotalDetteCol.setCellValueFactory(new PropertyValueFactory<>("montantTotal"));
+        montantVerserDetteCol.setCellValueFactory(new PropertyValueFactory<>("montantVerser"));
+        montantRestantDetteCol.setCellValueFactory(new PropertyValueFactory<>("montantRestant"));
+        etatDetteCol.setCellValueFactory(new PropertyValueFactory<>("etat"));
+        stateDetteCol.setCellValueFactory(new PropertyValueFactory<>("status"));
+        // <<
+    }
+
+    public void loadDetteNonSold() {
+        if (detteNonSoldTable == null)
+            return;
+        ObservableList<Dette> dettesFX = FXCollections.observableArrayList();
+        Client client = new Client();
+        client.setUser(Router.userConnect);
+        List<Dette> dettes = detteService.findAllDetteNonSoldeForClient(client);
+        for (Dette u : dettes) {
+            dettesFX.add(u);
+        }
+        detteNonSoldTable.setItems(dettesFX);
+        // >>Initialiser les colonnes de la table usersTable ici
+        idDetteCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         montantTotalDetteCol.setCellValueFactory(new PropertyValueFactory<>("montantTotal"));
         montantVerserDetteCol.setCellValueFactory(new PropertyValueFactory<>("montantVerser"));
         montantRestantDetteCol.setCellValueFactory(new PropertyValueFactory<>("montantRestant"));

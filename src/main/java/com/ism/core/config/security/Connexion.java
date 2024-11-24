@@ -8,8 +8,6 @@ import java.util.Scanner;
 import com.ism.controllers.implement.ImpView;
 import com.ism.core.config.router.IRouter;
 import com.ism.core.config.router.Router;
-import com.ism.core.factory.IFactory;
-import com.ism.core.factory.implement.Factory;
 import com.ism.core.helper.Errors;
 import com.ism.data.entities.User;
 import com.ism.data.repository.implement.UserRepository;
@@ -93,8 +91,7 @@ public class Connexion implements IConnexion, Initializable {
 
     private void switchAfterLogin(ActionEvent e, User user) {
         ImpView.setScanner(this.scanner);
-        IFactory factory = Factory.getInstance();
-        IRouter router = new Router(factory, scanner);
+        IRouter router = new Router();
         router.navigate(e, user);
     }
 }

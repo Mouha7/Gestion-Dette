@@ -105,7 +105,7 @@ public class Errors {
                 String originalStyle = field.getStyle();
 
                 // Applique le style d'erreur
-                field.setStyle("-fx-border-color: red; -fx-border-width: 2px; -fx-font-family: Arial;");
+                field.setStyle("-fx-background-radius: 5px; -fx-border-radius: 5px; -fx-border-color: red; -fx-border-width: 2px; -fx-font-family: Arial;");
 
                 // Crée un label d'erreur
                 Label errorLabel = new Label(errorMessage);
@@ -115,7 +115,7 @@ public class Errors {
                 // Positionne le label d'erreur sous le champ
                 Pane parent = (Pane) field.getParent();
                 errorLabel.setLayoutX(field.getLayoutX());
-                errorLabel.setLayoutY(field.getLayoutY() + field.getHeight() + 5);
+                errorLabel.setLayoutY(field.getLayoutY() + field.getHeight());
 
                 parent.getChildren().add(errorLabel);
 

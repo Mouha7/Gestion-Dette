@@ -1,11 +1,14 @@
 package com.ism.controllers.client.implement;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import com.ism.data.entities.Client;
 import com.ism.data.entities.DemandeDette;
 import com.ism.data.entities.Detail;
 import com.ism.data.entities.Dette;
@@ -19,32 +22,90 @@ import com.ism.services.IDetteService;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 
 import com.ism.controllers.IDemandeDetteView;
 import com.ism.controllers.IDetteView;
 import com.ism.controllers.client.IApplicationClient;
 import com.ism.controllers.implement.Application;
+import com.ism.core.config.router.Router;
+import com.ism.core.factory.IFactory;
+import com.ism.core.factory.implement.Factory;
+import com.ism.core.helper.Success;
 import com.ism.core.helper.Tools;
 
-public class ApplicationClient extends Application implements IApplicationClient {
-    private final IArticleService articleService;
-    private final IClientService clientService;
-    private final IDemandeDetteService demandeDetteService;
-    private final IDemandeDetteView demandeDetteView;
-    private final IDemandeArticleService demandeArticleService;
-    private final IDetteService detteService;
-    private final IDetteView detteView;
-    private final Scanner scanner;
+public class ApplicationClient extends Application implements IApplicationClient, Initializable {
+    @FXML
+    private Label numDemandeDette;
+    @FXML
+    private Label numDette;
+    @FXML
+    private Label numDetteNonSolde;
+    public Label infoConnect;
+    private IFactory factory = Factory.getInstance();
+    private IArticleService articleService;
+    private IClientService clientService;
+    private IDemandeDetteService demandeDetteService;
+    private IDemandeDetteView demandeDetteView;
+    private IDemandeArticleService demandeArticleService;
+    private IDetteService detteService;
+    private IDetteView detteView;
+    private Scanner scanner = new Scanner(System.in);
 
-    public ApplicationClient(IArticleService articleService, IClientService clientService, IDemandeDetteService demandeDetteService, IDemandeDetteView demandeDetteView, IDemandeArticleService demandeArticleService, IDetteService detteService, IDetteView detteView, Scanner scanner) {
-        this.articleService = articleService;
-        this.demandeDetteService = demandeDetteService;
-        this.demandeDetteView = demandeDetteView;
-        this.demandeArticleService = demandeArticleService;
-        this.detteService = detteService;
-        this.detteView = detteView;
-        this.clientService = clientService;
-        this.scanner = scanner;
+    public ApplicationClient() {
+        this.articleService = factory.getFactoryService().getInstanceArticleService();
+        this.demandeDetteService = factory.getFactoryService().getInstanceDemandeDetteService();
+        this.demandeDetteView = factory.getFactoryView().getInstanceDemandeDetteView();
+        this.demandeArticleService = factory.getFactoryService().getInstanceDemandeArticleService();
+        this.detteService = factory.getFactoryService().getInstanceDetteService();
+        this.detteView = factory.getFactoryView().getInstanceDetteView();
+        this.clientService = factory.getFactoryService().getInstanceClientService();
+    }
+
+    @Override
+    public void initialize(URL arg0, ResourceBundle arg1) {
+        this.articleService = factory.getFactoryService().getInstanceArticleService();
+        this.demandeDetteService = factory.getFactoryService().getInstanceDemandeDetteService();
+        this.demandeDetteView = factory.getFactoryView().getInstanceDemandeDetteView();
+        this.demandeArticleService = factory.getFactoryService().getInstanceDemandeArticleService();
+        this.detteService = factory.getFactoryService().getInstanceDetteService();
+        this.detteView = factory.getFactoryView().getInstanceDetteView();
+        this.clientService = factory.getFactoryService().getInstanceClientService();
+        Success.showSuccessMsg("Message Connexion", "Vous êtes connecté avec succès.");
+        if (infoConnect != null) {
+            infoConnect.setText(Router.userParams);
+        }
+        this.loadDash();
+    }
+
+    public void loadDash() {
+        Client client = new Client();
+        client.setUser(Router.userConnect);
+        this.numDetteNonSolde.setText("Dette Non Soldées ("+ detteService.findAllDetteNonSoldeForClient(client).size() +")");
+        this.numDette.setText("Dettes ("+ detteService.findAllDetteForClient(client).size() +")");
+        this.numDemandeDette.setText("Demandes Dettes ("+ demandeDetteService.findAllDemandeDettesForClient(client).size() +")");
+    }
+
+    @FXML
+    public void loadDetteSold(ActionEvent e) throws IOException {
+        Tools.loadPersist(e, "Liste Dette", "/com/ism/views/list.dette.solde.fxml");
+        // Mettre à jour les labels une fois les services initialisés
+        loadDash(); 
+    }
+
+    @FXML
+    public void loadGestionDemandesDette(ActionEvent e) throws IOException {
+        Tools.loadPersist(e, "Gestion Demandes Dette", "/com/ism/views/gestion.client.demande.dette.fxml");
+        // Mettre à jour les labels une fois les services initialisés
+        loadDash(); 
+    }
+
+    @FXML
+    public void loadRelanceDemandeDette(ActionEvent e) throws IOException {
+        Tools.loadPersist(e, "Relancement Demandes Dette", "/com/ism/views/relance.demande.dette.fxml");
+        // Mettre à jour les labels une fois les services initialisés
+        loadDash(); 
     }
 
     @FXML

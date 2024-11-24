@@ -2,8 +2,11 @@ package com.ism.services.implement;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
+import com.ism.data.entities.Client;
 import com.ism.data.entities.Dette;
+import com.ism.data.enums.EtatDette;
 import com.ism.data.repository.IDetteRepository;
 import com.ism.services.IDetteService;
 
@@ -35,9 +38,35 @@ public class DetteService implements IDetteService {
     }
 
     @Override
+    public List<Dette> findAllBy(Client client) {
+        return getAllNonSoldes()
+                .stream()
+                .filter(d -> (client != null && d.getClient().getId() == client.getId()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Dette> findAllDetteNonSoldeForClient(Client client) {
+        return getAllNonSoldes()
+                .stream()
+                .filter(d -> d.getClient().getUser() != null && d.getClient().getUser().getId() == client.getUser().getId() && d.getEtat() == EtatDette.ENCOURS)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Dette> findAllDetteForClient(Client client) {
+        return getAllNonSoldes()
+                .stream()
+                .filter(d -> d.getClient().getUser() != null && d.getClient().getUser().getId() == client.getUser().getId())
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Dette findBy(List<Dette> dettes, Dette dette) {
         for (Dette d : dettes) {
             if (Objects.equals(d.getId(), dette.getId())) {
+                return d;
+            } else if (d.getClient().getUser().getId() == dette.getClient().getUser().getId()) {
                 return d;
             }
         }

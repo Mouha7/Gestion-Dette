@@ -1,8 +1,10 @@
 package com.ism.controllers.store.implement;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.Scanner;
 
@@ -26,6 +28,8 @@ import com.ism.services.IUserService;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 
 import com.ism.controllers.IClientView;
 import com.ism.controllers.IDemandeDetteView;
@@ -34,42 +38,105 @@ import com.ism.controllers.IPaiementView;
 import com.ism.controllers.IUserView;
 import com.ism.controllers.implement.Application;
 import com.ism.controllers.store.IApplicationStorekeeper;
+import com.ism.core.config.router.Router;
+import com.ism.core.factory.IFactory;
+import com.ism.core.factory.implement.Factory;
+import com.ism.core.helper.Success;
 import com.ism.core.helper.Tools;
 
-public class ApplicationStorekeeper extends Application implements IApplicationStorekeeper {
-    private final IArticleService articleService;
-    private final IClientService clientService;
-    private final IClientView clientView;
-    private final IDemandeDetteService demandeDetteService;
-    private final IDemandeDetteView demandeDetteView;
-    private final IDetailService detailService;
-    private final IDetteService detteService;
-    private final IDetteView detteView;
-    private final IPaiementService paiementService;
-    private final IPaiementView paiementView;
-    private final IUserService userService;
-    private final IUserView userView;
+public class ApplicationStorekeeper extends Application implements IApplicationStorekeeper, Initializable {
+    private IFactory factory = Factory.getInstance();
+    private IArticleService articleService;
+    private IClientService clientService;
+    private IClientView clientView;
+    private IDemandeDetteService demandeDetteService;
+    private IDemandeDetteView demandeDetteView;
+    private IDetailService detailService;
+    private IDetteService detteService;
+    private IDetteView detteView;
+    private IPaiementService paiementService;
+    private IPaiementView paiementView;
+    private IUserService userService;
+    private IUserView userView;
+    // >> Chargement de données du dashboard
+    public Label numCustomer;
+    public Label numDette;
+    public Label numPaiement;
+    public Label numDemandeDette;
+    public Label infoConnect;
+    // <<
 
-    private final Scanner scanner;
+    private final Scanner scanner = new Scanner(System.in);
 
-    public ApplicationStorekeeper(IArticleService articleService,
-            IClientService clientService, IClientView clientView, IDemandeDetteService demandeDetteService,
-            IDemandeDetteView demandeDetteView, IDetailService detailService,
-            IDetteService detteService, IDetteView detteView, IPaiementService paiementService,
-            IPaiementView paiementView, IUserService userService, IUserView userView, Scanner scanner) {
-        this.articleService = articleService;
-        this.clientService = clientService;
-        this.clientView = clientView;
-        this.demandeDetteService = demandeDetteService;
-        this.demandeDetteView = demandeDetteView;
-        this.detailService = detailService;
-        this.detteService = detteService;
-        this.detteView = detteView;
-        this.paiementService = paiementService;
-        this.paiementView = paiementView;
-        this.userService = userService;
-        this.userView = userView;
-        this.scanner = scanner;
+    public ApplicationStorekeeper() {
+        this.articleService = factory.getFactoryService().getInstanceArticleService();
+        this.clientService = factory.getFactoryService().getInstanceClientService();
+        this.clientView = factory.getFactoryView().getInstanceClientView();
+        this.demandeDetteService = factory.getFactoryService().getInstanceDemandeDetteService();
+        this.demandeDetteView = factory.getFactoryView().getInstanceDemandeDetteView();
+        this.detailService = factory.getFactoryService().getInstanceDetailService();
+        this.detteService = factory.getFactoryService().getInstanceDetteService();
+        this.detteView = factory.getFactoryView().getInstanceDetteView();
+        this.paiementService = factory.getFactoryService().getInstancePaiementService();
+        this.paiementView = factory.getFactoryView().getInstancePaiementView();
+        this.userService = factory.getFactoryService().getInstanceUserService();
+        this.userView = factory.getFactoryView().getInstanceUserView();
+    }
+
+    @Override
+    public void initialize(URL arg0, ResourceBundle arg1) {
+        this.articleService = factory.getFactoryService().getInstanceArticleService();
+        this.clientService = factory.getFactoryService().getInstanceClientService();
+        this.clientView = factory.getFactoryView().getInstanceClientView();
+        this.demandeDetteService = factory.getFactoryService().getInstanceDemandeDetteService();
+        this.demandeDetteView = factory.getFactoryView().getInstanceDemandeDetteView();
+        this.detailService = factory.getFactoryService().getInstanceDetailService();
+        this.detteService = factory.getFactoryService().getInstanceDetteService();
+        this.detteView = factory.getFactoryView().getInstanceDetteView();
+        this.paiementService = factory.getFactoryService().getInstancePaiementService();
+        this.paiementView = factory.getFactoryView().getInstancePaiementView();
+        this.userService = factory.getFactoryService().getInstanceUserService();
+        this.userView = factory.getFactoryView().getInstanceUserView();
+        Success.showSuccessMsg("Message Connexion", "Vous êtes connecté avec succès.");
+        if (infoConnect != null) {
+            infoConnect.setText(Router.userParams);
+        }
+        loadDash();
+    }
+
+    public void loadDash() {
+        this.numCustomer.setText("Clients ("+ clientService.getAllActifsWithAccount().size() +")");
+        this.numDette.setText("Dettes ("+ detteService.length() +")");
+        this.numPaiement.setText("Paiements ("+ paiementService.length() +")");
+        this.numDemandeDette.setText("Demandes Dettes ("+ demandeDetteService.length() +")");
+    }
+
+    @FXML
+    public void loadGestionClient(ActionEvent e) throws IOException {
+        Tools.loadPersist(e, "Gestion Client", "/com/ism/views/gestion.store.client.fxml");
+        // Mettre à jour les labels une fois les services initialisés
+        loadDash(); 
+    }
+
+    @FXML
+    public void loadGestionDetteClient(ActionEvent e) throws IOException {
+        Tools.loadPersist(e, "Gestion Dette", "/com/ism/views/gestion.store.dette.fxml");
+        // Mettre à jour les labels une fois les services initialisés
+        loadDash(); 
+    }
+
+    @FXML
+    public void loadCreatedPay(ActionEvent e) throws IOException {
+        Tools.loadPersist(e, "Créer un paiement", "/com/ism/views/gestion.store.pay.fxml");
+        // Mettre à jour les labels une fois les services initialisés
+        loadDash(); 
+    }
+
+    @FXML
+    public void loadDemandeDetteEnCour(ActionEvent e) throws IOException {
+        Tools.loadPersist(e, "Liste Demande Dette", "/com/ism/views/list.demande.dette.fxml");
+        // Mettre à jour les labels une fois les services initialisés
+        loadDash(); 
     }
 
     @FXML
@@ -84,13 +151,13 @@ public class ApplicationStorekeeper extends Application implements IApplicationS
         String choice;
         String[] validValues = { "1", "2", "3", "4", "5", "6", "7", "8" };
         do {
-            System.out.println("1- Créer un client");
-            System.out.println("2- Lister les clients");
-            System.out.println("3- Rechercher un client");
-            System.out.println("4- Créer une dette");
-            System.out.println("5- Créer une paiement");
-            System.out.println("6- Lister les dettes non soldées");
-            System.out.println("7- Lister les demandes de dette en cours");
+            System.out.println("1- Créer un client"); // [OK]
+            System.out.println("2- Lister les clients"); // [OK]
+            System.out.println("3- Rechercher un client"); // [OK]
+            System.out.println("4- Créer une dette"); // [OK]
+            System.out.println("5- Créer une paiement"); // [MayBe OK]
+            System.out.println("6- Lister les dettes non soldées"); // [OK]
+            System.out.println("7- Lister les demandes de dette en cours"); // [OK]
             System.out.println("8- Déconnexion");
             System.out.print(MSG_CHOICE);
             choice = scanner.nextLine();
