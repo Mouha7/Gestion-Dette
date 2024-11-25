@@ -92,6 +92,7 @@ public class ClientService implements IClientService {
     @Override
     public void update(List<Client> clients, Client updateClient) {
         updateClient.setUpdatedAt(LocalDateTime.now());
+        updateClient.updateCumulMontantDu();
         clientRepository.update(updateClient);
     }
 }
