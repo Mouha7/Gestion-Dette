@@ -11,6 +11,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import java.time.LocalDateTime;
@@ -38,7 +39,8 @@ public class DemandeDette extends AbstractEntity {
     @OneToMany(mappedBy = "demandeDette", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DemandeArticle> demandeArticles = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    // @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "dette_id")
     private Dette dette;
 

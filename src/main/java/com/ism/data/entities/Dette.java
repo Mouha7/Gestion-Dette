@@ -13,6 +13,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.ism.data.enums.EtatDette;
@@ -46,7 +47,8 @@ public class Dette extends AbstractEntity {
     private Client client;
 
     // Relation avec l'entité DemandeDette
-    @ManyToOne(fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "dette")
+    // @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "demande_dette_id")
     private DemandeDette demandeDette;
 
